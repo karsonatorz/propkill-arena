@@ -40,6 +40,7 @@ AddCSLuaFile("client/scoreboard/scoreboard.lua")
 AddCSLuaFile("client/scoreboard/arenas.lua")
 AddCSLuaFile("client/scoreboard/leaderboard.lua")
 AddCSLuaFile("client/scoreboard/settings.lua")
+AddCSLuaFile("client/scoreboard/duel.lua")
 
 //AddCSLuaFile("client/derma/menu.lua")
 //AddCSLuaFile("client/derma/topbar.lua")

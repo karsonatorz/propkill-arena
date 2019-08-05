@@ -1,5 +1,5 @@
 "propkill-arena"
 {
-	"title"		"Propkill"
-	"menusystem"	"0"
+	"title"		"Propkill: Arena"
+	"menusystem"	"1"
 }

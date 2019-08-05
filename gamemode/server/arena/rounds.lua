@@ -22,7 +22,7 @@ end
 
 function gamemeta:AdvanceRound(roundName)
 	local name = tostring(self) .. roundName .. self.round.currentSubRound
-	
+
 	timer.Create(name, self.round[roundName][self.round.currentSubRound].time, 1, function()
 		self.round[roundName][self.round.currentSubRound].callback(self.arena)
 

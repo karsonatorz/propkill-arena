@@ -305,12 +305,12 @@ end
 concommand.Add("pk_rooftiles", roofTiles)
 
 local function removeSkybox()
-	PK_SetConfig("RemoveSkybox", !PK_GetConfig("RemoveSkybox"))
+	PK_SetConfig("RemoveSkybox", !PK.GetConfig("RemoveSkybox"))
 end
 concommand.Add("pk_removeskybox", removeSkybox)
 
 function UseLerpCommand(ply, cmd, args)
-	PK_SetConfig("UseLerpCommand", !PK_GetConfig("UseLerpCommand"))
+	PK_SetConfig("UseLerpCommand", !PK.GetConfig("UseLerpCommand"))
 end
 concommand.Add("pk_cl_physics", UseLerpCommand)
 

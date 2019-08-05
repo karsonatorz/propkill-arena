@@ -22,8 +22,9 @@ include("arena/gamemodes.lua")
 
 function PK.NewArena(data)
 	local newarena = setmetatable({}, arenameta)
+	local tbl = data or {}
 
-	//newarena.name = data.name or "Arena"
+	newarena.name = tbl.name or "Arena"
 	//newarena.spawns = data.spawns or {}
 	//newarena.maxplayers = data.maxplayers or 0
 
@@ -44,7 +45,7 @@ function arenameta:AddPlayer(ply)
 		return false
 	end
 
-	if ply.arena != nil then 
+	if ply.arena != nil then
 		ply.arena:RemovePlayer(ply)
 	end
 
@@ -101,7 +102,7 @@ function arenameta:SetGamemode(gm, keepPlayers)
 
 	self:CallGameHook("InitializeGame", v)
 
-	if keepPlayers then 
+	if keepPlayers then
 		for k,v in pairs(self.players) do
 			local canjoin, reason = self:CallGameHook("PlayerJoinArena", v)
 
@@ -171,29 +172,29 @@ arena1 = PK.NewArena()
 
 game1 = PK.NewGamemode("oog")
 
-team1 = game1:CreateTeam("nigs", Color(255,0,0))
-team2 = game1:CreateTeam("jews", Color(0,255,0))
+team1 = game1:CreateTeam("Team1", Color(255,0,0))
+team2 = game1:CreateTeam("Team2", Color(0,255,0))
 
 game1:AddRound("test", 10, function(arena)
 	for k,v in pairs(arena.players) do
 		//v:Spawn()
-		v:ChatPrint("warmup over")
-		v:ChatPrint("game starting")
+		v:ChatPrint("Warmup over")
+		v:ChatPrint("Game starting")
 	end
 	//arena:Cleanup()
 end)
 
 game1:AddRound("test", 30, function(arena)
 	for k,v in pairs(arena.players) do
-		v:ChatPrint("game over")
+		v:ChatPrint("Game over!")
 	end
 end)
 
-game1:Hook("PlayerJoinedArena", "ass", function(arena, ply)
-	ply:ChatPrint("welcome to " .. (game1.name or "gamemode"))
+game1:Hook("PlayerJoinedArena", "PK_Arena_PlayerJoined", function(arena, ply)
+	ply:ChatPrint("Welcome to " .. arena.name .. ", now playing " .. game1.name or "gamemode")
 end)
 
-game1:Hook("PlayerSpawn", "nigger", function(arena, ply)
+game1:Hook("PlayerSpawn", "game1_playerpsawn", function(arena, ply)
 	if math.Round(math.random(0,1)) then
 		team1:AddPlayer()
 	else
@@ -204,16 +205,17 @@ game1:Hook("PlayerSpawn", "nigger", function(arena, ply)
 	ply:SetEyeAngles(arena.spawns.ffa[spawn].ang)
 end)
 
-game1:Hook("InitializeGame", "fat", function(arena)
+game1:Hook("InitializeGame", "game1_initializegame", function(arena)
 	game1:StartRound("test", function(arena)
 		for k,v in pairs(arena.players) do
 			//v:Spawn()
 			team1:AddPoints(5)
 			team1:AddPoints(-2)
-			v:ChatPrint("warmup started " .. team1:TotalFrags() .. " " .. team1:TotalDeaths() .. " " .. team1:GetPoints())
+			v:ChatPrint("Warmup started " .. team1:TotalFrags() .. " " .. team1:TotalDeaths() .. " " .. team1:GetPoints())
 		end
 	end)
 end)
+
 
 arena1:SetGamemode(game1)
 

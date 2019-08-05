@@ -1,0 +1,5 @@
+"propkill-arena"
+{
+	"title"		"Propkill"
+	"menusystem"	"0"
+}

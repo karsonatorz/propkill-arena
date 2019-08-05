@@ -1,3 +1,5 @@
+include("settings.lua")
+
 surface.CreateFont("pk_scoreboardfont", {
 	font = "stb24",
 	size = 32,
@@ -104,7 +106,7 @@ function PK.CreateMenu()
 	local sheet = tabs:AddSheet("Scoreboard", panel1)
 	sheet.Panel:DockMargin(8,8,8,8)
 	sheet.Panel:Dock(FILL)
-	
+
 	local Scoreboard = include("scoreboard.lua")
 	local RefreshScoreboard = Scoreboard(panel1)
 
@@ -124,7 +126,7 @@ function PK.CreateMenu()
 	sheet.Panel:DockMargin(4,4,4,4)
 	sheet.Panel:Dock(FILL)
 
-	local panel4 = vgui.Create("DPanel", tabs)
+	local panel4 = vgui.Create("PK.Settings", tabs)
 	function panel4:Paint(w, h)
 		//draw.RoundedBox(0, 0, 0, w, h, colors.primaryAlt)
 	end
@@ -167,7 +169,7 @@ function PK.CreateMenu()
 		RefreshScoreboard()
 		self:SetVisible(true)
 	end
-	
+
 	return frame
 end
 

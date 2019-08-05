@@ -19,7 +19,7 @@ function PANEL:MakeSettings()
 
 	self.settings = {}
 
-	for k,v in pairs(PK.Client.Config.config) do
+	for k,v in pairs(PK.Client.Config:Get()) do
 		if v.Type == "bool" then
 			local checkbox = vgui.Create("DCheckBoxLabel", self.clientSettings)
 			checkbox:Dock(TOP)

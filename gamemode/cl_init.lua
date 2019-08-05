@@ -1,7 +1,12 @@
 include("shared.lua")
+include("shared/config.lua")
 include("client/config.lua")
 include("client/hud.lua")
 include("client/hax.lua")
+
+// Settings
+include("client/settings/view.lua")
+include("client/settings/misc.lua")
 
 include("client/derma.lua")
 include("client/base.lua")

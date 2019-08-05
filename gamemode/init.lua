@@ -34,6 +34,10 @@ AddCSLuaFile("client/arena.lua")
 AddCSLuaFile("shared/entity.lua")
 AddCSLuaFile("client/rounds.lua")
 
+// Settings
+AddCSLuaFile("client/settings/view.lua")
+AddCSLuaFile("client/settings/misc.lua")
+
 // Scoreboard/Menu
 AddCSLuaFile("client/scoreboard/frame.lua")
 AddCSLuaFile("client/scoreboard/scoreboard.lua")

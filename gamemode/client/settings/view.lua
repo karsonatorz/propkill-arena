@@ -189,10 +189,10 @@ function PK.Client.TrackPlayers()
 	end
 end
 
--- Autorun all enabled settings on start
-
+// Autorun all enabled settings on start
 for k,v in pairs(PK.Client) do
-	if isbool(PK.Client.Config:Get(k)) and PK.Client.Config:Get(k) == true then
+	if not PK.Client.Config:Get(k) then continue end
+	if isbool(PK.Client.Config:Get(k).Value) and PK.Client.Config:Get(k).Value == true then
 		v()
 	end
 end

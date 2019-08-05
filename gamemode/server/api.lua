@@ -68,7 +68,6 @@ end
 function PKAPI:UploadQueue()
 	local newQueue = {Players = {}}
 	if #self.queue.Players == 0 then
-		print("PKAPI: Nothing to upload")
 		return false
 	end
 	for k,v in pairs(self.queue.Players or {}) do

@@ -16,6 +16,7 @@ include("server/base.lua")
 include("shared/entity.lua")
 include("server/config.lua")
 include("server/arena.lua")
+include("shared/networking.lua")
 
 
 AddCSLuaFile("cl_init.lua")
@@ -29,6 +30,13 @@ AddCSLuaFile("client/base.lua")
 AddCSLuaFile("client/commands.lua")
 AddCSLuaFile("client/arena.lua")
 AddCSLuaFile("shared/entity.lua")
+AddCSLuaFile("shared/networking.lua")
+
+
+AddCSLuaFile("client/arena/gamemodes.lua")
+AddCSLuaFile("client/arena/rounds.lua")
+AddCSLuaFile("client/arena/teams.lua")
+AddCSLuaFile("client/arena/hooks.lua")
 
 // Settings
 AddCSLuaFile("client/settings/view.lua")

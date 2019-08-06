@@ -113,4 +113,6 @@ function PKAPI:AddPropSpawn(ply, model)
 	self:AddModelStat(ply, "PropSpawns", model)
 end
 
-PK.API = PK.SetupAPI()
+if not PK.API then
+	PK.API = PK.SetupAPI()
+end

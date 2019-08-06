@@ -4,7 +4,7 @@ concommand.Add("rserver", function(ply)
 	end
 end)
 
-function ConfigSet(ply, cmd, args)
+local function ConfigSet(ply, cmd, args)
 	if #args == 0 then return false end
 
 	if PK.config[args[1]] == nil then
@@ -34,7 +34,7 @@ function ConfigSet(ply, cmd, args)
 end
 concommand.Add("pk_setconfig", ConfigSet)
 
-function ConfigSet(ply, cmd, args)
+local function ConfigGet(ply, cmd, args)
 	PrintTable(PK.config)
 	for k,v in pairs(PK.config) do
 		if !istable(v) then
@@ -44,4 +44,4 @@ function ConfigSet(ply, cmd, args)
 		end
 	end
 end
-concommand.Add("pk_getconfig", ConfigSet)
+concommand.Add("pk_getconfig", ConfigGet)

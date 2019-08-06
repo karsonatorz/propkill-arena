@@ -11,8 +11,8 @@ PK = PK or {
 	arenas = {},
 	gamemodes = {},
 	menu = {},
+	Client = {}
 }
-
 
 function GM:CreateTeams()
 	TEAM_DEATHMATCH = 1

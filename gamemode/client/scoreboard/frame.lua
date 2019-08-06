@@ -106,7 +106,6 @@ function PK.CreateMenu()
 	local sheet = tabs:AddSheet("Scoreboard", panel1)
 	sheet.Panel:DockMargin(8,8,8,8)
 	sheet.Panel:Dock(FILL)
-
 	local Scoreboard = include("scoreboard.lua")
 	local RefreshScoreboard = Scoreboard(panel1)
 
@@ -122,15 +121,23 @@ function PK.CreateMenu()
 	function panel3:Paint(w, h)
 		//draw.RoundedBox(0, 0, 0, w, h, colors.primaryAlt)
 	end
-	sheet = tabs:AddSheet("Leaderboards", panel3)
+	sheet = tabs:AddSheet("Duel", panel3)
 	sheet.Panel:DockMargin(4,4,4,4)
 	sheet.Panel:Dock(FILL)
 
-	local panel4 = vgui.Create("PK.Settings", tabs)
+	local panel4 = vgui.Create("DPanel", tabs)
 	function panel4:Paint(w, h)
 		//draw.RoundedBox(0, 0, 0, w, h, colors.primaryAlt)
 	end
-	sheet = tabs:AddSheet("Settings", panel4)
+	sheet = tabs:AddSheet("Leaderboards", panel4)
+	sheet.Panel:DockMargin(4,4,4,4)
+	sheet.Panel:Dock(FILL)
+
+	local panel5 = vgui.Create("PK.Settings", tabs)
+	function panel5:Paint(w, h)
+		//draw.RoundedBox(0, 0, 0, w, h, colors.primaryAlt)
+	end
+	sheet = tabs:AddSheet("Settings", panel5)
 	sheet.Panel:DockMargin(4,4,4,4)
 	sheet.Panel:Dock(FILL)
 
@@ -176,10 +183,6 @@ end
 PK.menu = PK.CreateMenu()
 
 function GM:ScoreboardShow()
-	if not IsValid(PK.menu) then
-		PK.menu = PK.CreateMenu()
-	end
-
 	PK.menu:Show()
 
 	if CurTime() - lastopen < 0.25 then

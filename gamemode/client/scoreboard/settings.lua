@@ -12,7 +12,7 @@ function PANEL:Refresh()
 end
 
 function PANEL:MakeSettings()
-		self.clientSettings = vgui.Create("Panel", self)
+	self.clientSettings = vgui.Create("Panel", self)
 	self.serverSettings = vgui.Create("Panel", self)
 
 	PK.GetServerConfig()

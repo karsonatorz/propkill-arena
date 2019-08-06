@@ -1,6 +1,4 @@
-PK = PK or {}
-
-PK.Config = Config("pkr_sv_config.txt", {
+PK.Config = PK.CreateConfig("pkr_sv_config.txt", {
 	MaxProps = {LongName = "Max props", Type = "number", DecimalPoints = 0, Default = 7},
 	LimitFrozenProps = {LongName = "Limit frozen props", Type = "bool", Default = true},
 	MaxFrozenProps = {LongName = "Max Frozen Props", Type = "number", DecimalPoints = 0, Default = 3},
@@ -9,7 +7,6 @@ PK.Config = Config("pkr_sv_config.txt", {
 	PKAPIAddress = {LongName = "PK API URL", Type = "string", Default = "127.0.0.1:8080"}
 })
 
-RunConsoleCommand("sbox_noclip", "0")
 RunConsoleCommand("sbox_maxprops", PK.Config:Get("MaxProps").Value)
 
 net.Receive("PK_Config_Get", function(len, ply)

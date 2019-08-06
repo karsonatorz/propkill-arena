@@ -3,23 +3,12 @@
 	Defines the config object
 */
 
-PK = PK or {
-	Client = {}
-}
-
-Config = {}
+local Config = {}
 Config.__index = Config
 
-function Config.__call(self, fileName, default)
-	return Config:Create(fileName or nil, default or nil)
-end
-
-setmetatable(Config, Config) -- wtf
-
-function Config:Create(fileName, default)
+function PK.CreateConfig(fileName, default)
 	local config = {}
 	setmetatable(config, Config)
-	self.__index = self
 
 	config.fileName = fileName or "pkr_sh_settings.txt"
 	config.default = default or {}
@@ -50,7 +39,7 @@ function Config:ResetToDefault()
 	for k,v in pairs(self.config) do
 		self.config[k] = self.default[k]
 	end
-	config:Save()
+	self:Save()
 end
 
 function Config:Set(setting, value)

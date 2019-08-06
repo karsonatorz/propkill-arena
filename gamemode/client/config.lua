@@ -1,6 +1,4 @@
-PK.Client = {}
-
-PK.Client.Config = Config("pkr_cl_settings.txt", {
+PK.Client.Config = PK.CreateConfig("pkr_cl_settings.txt", {
 	RemoveSkybox = {LongName = "Replace skybox with grey", Type = "bool", Default = false},
 	RoofTiles = {LongName = "Enable rooftiles in skybox", Type = "bool", Default = false},
 	UseLerpCommand = {LongName = "Use lerp command (more responsive props)", Type = "bool", Default = false},
@@ -29,7 +27,8 @@ end
 
 net.Receive("PK_Config_Get", function(len)
 	PK.ServerConfig = net.ReadTable()
-	return PK.ServerConfig
 end)
 
-PK.GetServerConfig()
+hook.Add("InitPostEntity", "PK_Config_GetServerConfig", function()
+	PK.GetServerConfig()
+end)

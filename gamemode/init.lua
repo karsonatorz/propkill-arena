@@ -17,8 +17,6 @@ include("shared/entity.lua")
 include("server/config.lua")
 include("server/arena.lua")
 
-// Gamemodes
-//include("gamemodes/ffa/init.lua")
 
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
@@ -26,13 +24,11 @@ AddCSLuaFile("shared/config.lua")
 AddCSLuaFile("client/config.lua")
 AddCSLuaFile("client/hud.lua")
 AddCSLuaFile("client/hax.lua")
-AddCSLuaFile("client/scoreboard.lua")
 AddCSLuaFile("client/derma.lua")
 AddCSLuaFile("client/base.lua")
 AddCSLuaFile("client/commands.lua")
 AddCSLuaFile("client/arena.lua")
 AddCSLuaFile("shared/entity.lua")
-AddCSLuaFile("client/rounds.lua")
 
 // Settings
 AddCSLuaFile("client/settings/view.lua")
@@ -46,10 +42,6 @@ AddCSLuaFile("client/scoreboard/leaderboard.lua")
 AddCSLuaFile("client/scoreboard/settings.lua")
 AddCSLuaFile("client/scoreboard/duel.lua")
 
-//AddCSLuaFile("client/derma/menu.lua")
-//AddCSLuaFile("client/derma/topbar.lua")
-//AddCSLuaFile("client/derma/settings.lua")
-//AddCSLuaFile("client/derma/duel.lua")
 
 /*------------------------------------------
 				Network Strings

@@ -5,19 +5,12 @@
 	Also will be used for duel/round results
 */
 
-PKAPI = {}
+local PKAPI = {}
 PKAPI.__index = PKAPI
 
-function PKAPI.__call(self, address, apiKey)
-	return self:Create(address or nil, apiKey or nil)
-end
-
-setmetatable(PKAPI, PKAPI)
-
-function PKAPI:Create(address, apiKey)
+function PK.SetupAPI(address, apiKey)
 	local api = {}
 	setmetatable(api, PKAPI)
-	self.__index = self
 
 	print("PK API object created!")
 
@@ -120,8 +113,4 @@ function PKAPI:AddPropSpawn(ply, model)
 	self:AddModelStat(ply, "PropSpawns", model)
 end
 
-//if PK.Config:Get("EnablePKAPI").Value then
-//	hook.Add("Initialize", "PK_API_Create", function()
-PK.API = PKAPI()
-//	end)
-//end
+PK.API = PK.SetupAPI()

@@ -13,6 +13,7 @@ function gamemeta:HookRemove(event, uniqueid)
 	self.userHooks[event][uniqueid] = nil
 end
 
+/*
 function gamemeta:HookCall(event, ...)
 	if self.hooks.customHooks[event] == nil then
 		error("Attempt to call non-existent arena hook", 2)
@@ -21,6 +22,7 @@ function gamemeta:HookCall(event, ...)
 
 	return self.hooks.customHooks[event](self.arena, ...)
 end
+*/
 
 function gamemeta.hooks.customHooks.PlayerJoinArena(arena, arenaGame, ply)
 	for k,v in pairs(arena.gamemode.userHooks.PlayerJoinArena) do

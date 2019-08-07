@@ -1,6 +1,5 @@
 if SERVER then
 	util.AddNetworkString("PK_Networking")
-	util.AddNetworkString("PK_NetworkingBulk")
 	util.AddNetworkString("PK_NetworkingReady")
 end
 
@@ -23,6 +22,8 @@ end
 if SERVER then
 	for k,v in pairs(networktypes) do
 		PK["SetNW" .. k] = function(id, value)
+			if id == nil then return end
+			PK.netCache[id] = value
 			net.Start("PK_Networking")
 				net.WriteString(id)
 				net.WriteString(v)
@@ -32,7 +33,7 @@ if SERVER then
 	end
 
 	net.Receive("PK_NetworkingReady", function(len, ply)
-		net.Start("PK_NetworkingBulk")
+		net.Start("PK_NetworkingReady")
 			net.WriteTable(PK.netCache)
 		net.Send(ply)
 	end)
@@ -46,7 +47,7 @@ if CLIENT then
 		PK.netCache[id] = value
 	end)
 
-	net.Receive("PK_NetworkingBulk", function()
+	net.Receive("PK_NetworkingReady", function()
 		PK.netCache = net.ReadTable()
 	end)
 

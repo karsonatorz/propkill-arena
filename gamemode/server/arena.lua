@@ -3,10 +3,6 @@ arenameta.__index = arenameta
 
 PK.arenameta = arenameta
 
-arenameta.players = {}
-arenameta.props = {}
-arenameta.gamemode = {}
-arenameta.hooks = {}
 arenameta.spawns = {
 	ffa = {
 		{ pos = Vector(6596.689453, -4628.974609, 471.107269), ang = Angle(0, -90, 0) },
@@ -21,15 +17,21 @@ arenameta.spawns = {
 include("arena/gamemodes.lua")
 
 function PK.NewArena(data)
-	local newarena = setmetatable({}, arenameta)
 	local tbl = data or {}
+	local arenatemplate = {
+		name = tbl.name or "Arena",
+		maxplayers = tbl.maxplayers or 0,
+		//spawns = tbl.spawns or {},
+		players = {},
+		props = {},
+		hooks = {},
+		gamemode = {},
+	}
 
-	newarena.name = tbl.name or "Arena"
+	local newarena = setmetatable(arenatemplate, arenameta)
+
 	//newarena.spawns = data.spawns or {}
 	//newarena.maxplayers = data.maxplayers or 0
-
-
-	//hook setup
 
 	return newarena
 end
@@ -39,20 +41,20 @@ end
 function arenameta:AddPlayer(ply)
 	if not IsValid(ply) or not ply:IsPlayer() then return false end
 
-	local canjoin, reason = self:CallGameHook("PlayerJoinArena", ply)
+	local canjoin, reason = self:CallGMHook("PlayerJoinArena", ply)
 	if not canjoin then
 		print(reason)
 		return false
 	end
 
-	if ply.arena != nil then
+	if IsValid(ply.arena) then
 		ply.arena:RemovePlayer(ply)
 	end
 
 	self.players[ply:UserID()] = ply
 	ply.arena = self
 	ply:Spawn()
-	self:CallGameHook("PlayerJoinedArena", ply)
+	self:CallGMHook("PlayerJoinedArena", ply)
 	return true
 end
 
@@ -60,7 +62,7 @@ function arenameta:RemovePlayer(ply, silent)
 	if ply.arena == nil then return end
 
 	if not silent then
-		self:CallGameHook("PlayerLeaveArena", ply)
+		self:CallGMHook("PlayerLeaveArena", ply)
 	end
 
 	if IsValid(ply.team) then
@@ -74,7 +76,7 @@ end
 
 // ==== Arena Hooks ==== \\
 
-function arenameta:CallGameHook(event, ...)
+function arenameta:CallGMHook(event, ...)
 	local gm = self.gamemode
 	if not IsValid(gm) then return false end
 
@@ -87,27 +89,40 @@ function arenameta:CallGameHook(event, ...)
 end
 
 
-// ==== Arena Util ==== \\
+// ==== Arena Gamemode ==== \\
 
 function arenameta:SetGamemode(gm, keepPlayers)
 	if not IsValid(gm) then return end
 
-	if IsValid(self.gamemode) then
-		self:CallGameHook("TerminateGame", v)
+	self:GamemodeCleanup()
+	self.gamemode = gm
+
+	for k,v in pairs(gm.userHooks) do
+		if gm.hooks.customHooks[k] == nil then
+			self.hooks[k] = tostring(self)
+
+			hook.Add(k, tostring(self), function(ply, ...)
+				if not IsValid(self) then return end
+				if ply.arena != self then return end
+
+				for kk, vv in pairs(v) do
+					local ret = vv(self, ply, ...)
+					
+					if type(ret) != "nil" then
+						return ret
+					end
+				end
+			end)
+		end
 	end
 
-	self:Cleanup()
-	self.gamemode = gm
-	gm.arena = self
-
-	self:CallGameHook("InitializeGame", v)
+	self:CallGMHook("InitializeGame", v)
 
 	if keepPlayers then
 		for k,v in pairs(self.players) do
-			local canjoin, reason = self:CallGameHook("PlayerJoinArena", v)
-
+			local canjoin, reason = self:CallGMHook("PlayerJoinArena", v)
 			if canjoin then
-				self:CallGameHook("PlayerJoinedArena", v)
+				self:CallGMHook("PlayerJoinedArena", v)
 			end
 		end
 	else
@@ -116,6 +131,22 @@ function arenameta:SetGamemode(gm, keepPlayers)
 		end
 	end
 end
+
+function arenameta:GamemodeCleanup()
+	if IsValid(self.gamemode) then
+		self:CallGMHook("TerminateGame", v)
+	end
+
+	self:Cleanup()
+
+	for k,v in pairs(self.hooks) do
+		hook.Remove(k, v)
+	end
+
+	self.gamemode = nil
+end
+
+// ==== Arena Utility ==== \\
 
 function arenameta:Cleanup()
 	for k,v in pairs(self.props) do
@@ -167,8 +198,29 @@ end)
 
 
 
+arena1 = arena1 or PK.NewArena()
+game1 = PK.NewGamemode("oog")
+
+game1:Hook("PlayerSpawn", "game1_playerpsawn", function(arena, ply)
+	local spawn = math.random(1, #arena.spawns.ffa)
+	ply:SetPos(arena.spawns.ffa[spawn].pos)
+	ply:SetEyeAngles(arena.spawns.ffa[spawn].ang)
+end)
+
+game1:Hook("PlayerSpawnedProp", "game1_playerpsawn", function(arena, ply, model, ent)
+	print(model)
+end)
+
+game1:Hook("PlayerJoinedArena", "asdasd", function(arena, ply)
+	ply:ChatPrint("welcome 2 " .. game1.name)
+end)
+
+arena1:SetGamemode(game1, true)
+
+/*
 
 arena1 = PK.NewArena()
+arena2 = PK.NewArena()
 
 game1 = PK.NewGamemode("oog")
 
@@ -217,5 +269,4 @@ game1:Hook("InitializeGame", "game1_initializegame", function(arena)
 end)
 
 
-arena1:SetGamemode(game1)
-
+arena1:SetGamemode(game1)*/

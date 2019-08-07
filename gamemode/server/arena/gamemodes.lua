@@ -3,9 +3,6 @@ gamemeta.__index = gamemeta
 
 PK.gamemeta = gamemeta
 
-gamemeta.teams = {}
-gamemeta.round = {}
-gamemeta.userHooks = {}
 gamemeta.hooks = {
 	playerHooks = {
 		"PlayerSpawn",
@@ -23,9 +20,34 @@ include("rounds.lua")
 include("teams.lua")
 
 function PK.NewGamemode(name)
-	local newgm = setmetatable({}, gamemeta)
+	local gametemplate = {
+		name = name or "",
+		teams = {},
+		round = {},
+		userHooks = {},
+	}
+	local newgm = setmetatable(gametemplate, gamemeta)
+	PK.gamemodes[name] = newgm
 
-	newgm.name = name
+	for k,v in pairs(newgm.hooks.playerHooks) do
+		newgm.userHooks[v] = {}
+	end
+	for k,v in pairs(newgm.hooks.customHooks) do
+		newgm.userHooks[k] = {}
+	end
+
+	return newgm
+end
+
+/*
+function PK.NewGamemode(name)
+	local gametemplate = {
+		name = name or "",
+		teams = {},
+		round = {},
+		userHooks = {},
+	}
+	local newgm = setmetatable(gametemplate, gamemeta)
 
 	// hook setup
 
@@ -34,10 +56,12 @@ function PK.NewGamemode(name)
 		newgm.userHooks[v] = {}
 
 		hook.Add(v, tostring(newgm), function(ply, ...)
-			if ply.arena != newgm.arena then return end
+			local arena = ply.arena
+			if not IsValid(arena) then return end
+			if arena.gamemode != newgm then return end
 
 			for kk, vv in pairs(newgm.userHooks[v]) do
-				local ret = vv(newgm.arena, ply, ...)
+				local ret = vv(arena, ply, ...)
 				if type(ret) != "nil" then
 					return ret
 				end
@@ -52,15 +76,19 @@ function PK.NewGamemode(name)
 
 	return newgm
 end
+*/
 
 function gamemeta:CreateTeam(name, color)
 	if name == nil then return false end
 
-	self.teams[name] = setmetatable({}, PK.teammeta)
-
-	self.teams[name].name = name
-	self.teams[name].arena = self
-	self.teams[name].color = color or Color(0,0,0)
+	local teamtemplate = {
+		points = 0,
+		players = {},
+		name = name,
+		arena = self,
+		color = color or Color(),
+	}
+	self.teams[name] = setmetatable(teamtemplate, PK.teammeta)
 
 	return self.teams[name]
 end

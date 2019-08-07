@@ -3,9 +3,6 @@ teammeta.__index = teammeta
 
 PK.teammeta = teammeta
 
-teammeta.points = 0
-teammeta.players = {}
-
 function teammeta:AddPlayer(ply)
 	if not IsValid(ply) or not ply:IsPlayer() then return false end
 

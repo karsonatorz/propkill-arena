@@ -89,7 +89,6 @@ function GM:PlayerDeath(ply, inflictor, attacker)
 		net.WriteString(inflictor:GetClass())
 		net.WriteEntity(attacker)
 	net.Broadcast()
-
 end
 
 function GM:PlayerConnect(name, ip)

@@ -16,6 +16,7 @@ include("server/base.lua")
 include("shared/entity.lua")
 include("server/config.lua")
 include("server/arena.lua")
+include("server/elo.lua")
 include("shared/networking.lua")
 
 

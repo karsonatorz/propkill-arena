@@ -6,7 +6,7 @@ local function Scoreboard(parent)
 	function columns:Paint(w, h)
 		draw.RoundedBox(4, 0, 0, w, h, colors.primary)
 	end
-	
+
 	local col1 = vgui.Create("DPanel", columns)
 	col1:Dock(LEFT)
 	function col1:Paint(w, h)
@@ -18,19 +18,25 @@ local function Scoreboard(parent)
 	function col2:Paint(w, h)
 		draw.SimpleText("Kills", "pk_bindfont1", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 	end
-	
+
 	local col3 = vgui.Create("DPanel", columns)
 	col3:Dock(LEFT)
 	function col3:Paint(w, h)
 		draw.SimpleText("Deaths", "pk_bindfont1", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 	end
-	
+
 	local col4 = vgui.Create("DPanel", columns)
 	col4:Dock(LEFT)
 	function col4:Paint(w, h)
+		draw.SimpleText("ELO", "pk_bindfont1", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+	end
+
+	local col5 = vgui.Create("DPanel", columns)
+	col5:Dock(LEFT)
+	function col5:Paint(w, h)
 		draw.SimpleText("Ping", "pk_bindfont1", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 	end
-	
+
 	local scroll = vgui.Create("DScrollPanel", parent)
 	scroll:Dock(FILL)
 	scroll.VBar:SetWidth(8)
@@ -41,20 +47,21 @@ local function Scoreboard(parent)
 	function scroll.VBar:Paint(w, h)
 		draw.RoundedBox(0, 0, 0, w, h, colors.primary)
 	end
-	
+
 	function columns:PerformLayout()
 		local colwidth = self:GetWide()+4
-		
+
 		if scroll.VBar.Enabled then
 			colwidth = colwidth - 8
 		end
-		
-		col1:SetWidth(colwidth * 0.55)
+
+		col1:SetWidth(colwidth * 0.40)
 		col2:SetWidth(colwidth * 0.15)
 		col3:SetWidth(colwidth * 0.15)
-		col4:SetWidth(colwidth * 0.15+4)
+		col4:SetWidth(colwidth * 0.15)
+		col5:SetWidth(colwidth * 0.15+4)
 	end
-	
+
 	local teams = vgui.Create("DIconLayout", scroll)
 	teams:Dock(FILL)
 	teams:SetSpaceX(3)
@@ -62,7 +69,7 @@ local function Scoreboard(parent)
 
 	local function reloadPanel()
 		if not IsValid(teams) then return end
-		
+
 		for k,v in pairs(teams:GetChildren()) do
 			v:Remove()
 		end
@@ -113,6 +120,12 @@ local function Scoreboard(parent)
 					draw.SimpleText(v:Deaths() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 				end
 
+				local elo = vgui.Create("DPanel", prow)
+				elo:Dock(LEFT)
+				function elo:Paint(w, h)
+					draw.SimpleText(v:GetNWInt("Elo") or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				end
+
 				local ping = vgui.Create("DPanel", prow)
 				ping:Dock(LEFT)
 				function ping:Paint(w, h)
@@ -123,16 +136,17 @@ local function Scoreboard(parent)
 					local colwidth = self:GetParent():GetWide()
 
 					self:SetWidth(colwidth)
-					name:SetWidth(colwidth * 0.55)
+					name:SetWidth(colwidth * 0.40)
 					kills:SetWidth(colwidth * 0.15)
 					deaths:SetWidth(colwidth * 0.15)
+					elo:SetWidth(colwidth * 0.15)
 					ping:SetWidth(colwidth * 0.15)
 				end
 			end
 
 			function item:PerformLayout()
 				local colwidth = self:GetParent():GetWide()
-				
+
 				teamname:SetSize(colwidth, 32)
 				players:Layout()
 

@@ -15,7 +15,7 @@ function gamemeta:StartRound(roundName, arena, startCallback)
 	self:AdvanceRound(roundName, arena)
 
 	if startCallback != nil then
-		startCallback(roundName, arena)
+		startCallback(arena)
 	end
 
 end

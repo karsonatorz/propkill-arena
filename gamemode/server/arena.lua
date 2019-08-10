@@ -14,17 +14,21 @@ arenameta.spawns = {
 	}
 }
 
+include("arena/net.lua")
 include("arena/gamemodes.lua")
 
 function PK.NewArena(data)
 	local tbl = data or {}
 	local arenatemplate = {
-		name = tbl.name or "Arena",
-		maxplayers = tbl.maxplayers or 0,
+		name = tbl.name or "Arena" .. #PK.arenas + 1,
 		//spawns = tbl.spawns or {},
+		maxplayers = 0,
 		players = {},
 		props = {},
 		hooks = {},
+		timers = {},
+		round = {},
+		teams = {},
 		gamemode = {},
 		gmvars = {},
 	}
@@ -54,8 +58,12 @@ function arenameta:AddPlayer(ply)
 
 	self.players[ply:UserID()] = ply
 	ply.arena = self
-	ply:Spawn()
+
+	self:UpdateNWTable("players", ply:UserID(), ply)
 	self:CallGMHook("PlayerJoinedArena", ply)
+
+	ply:Spawn()
+
 	return true
 end
 
@@ -72,6 +80,8 @@ function arenameta:RemovePlayer(ply, silent)
 
 	ply.arena = nil
 	self.players[ply:UserID()] = nil
+
+	self:UpdateNWTable("players", ply:UserID(), nil)
 end
 
 
@@ -119,11 +129,14 @@ function arenameta:SetGamemode(gm, keepPlayers)
 		end
 	end
 
-	// setup the round functions
-	self.gmvars.round = {}
-
+	// setup rounds
 	for k,v in pairs(gm.round) do
-		self.gmvars.round[k] = v
+		self.round[k] = v
+	end
+
+	// setup teams
+	for k,v in pairs(gm.teams) do
+		self.teams[k] = setmetatable(v, PK.teammeta)
 	end
 
 	// tell the gamemode to initialize
@@ -141,6 +154,8 @@ function arenameta:SetGamemode(gm, keepPlayers)
 			self:RemovePlayer(v)
 		end
 	end
+
+	self:SetNWVar("gamemode", self:GetInfo().gamemode)
 end
 
 function arenameta:GamemodeCleanup()
@@ -156,14 +171,39 @@ function arenameta:GamemodeCleanup()
 
 	self.gamemode = {}
 	self.gmvars = {}
+	self.round = {}
+	self.teams = {}
 end
 
 // ==== Arena Utility ==== \\
+
+function arenameta:GetInfo()
+	local data = {
+		name = self.name,
+		maxplayers = self.maxplayers,
+		players = self.players,
+		props = self.props,
+		teams = self.teams,
+		round = {
+			self.round.currentRound or "",
+			self.round.currentSubRound or "",
+		},
+		gamemode = {
+			name = self.gamemode.name or "",
+		},
+	}
+	return data
+end
 
 function arenameta:Cleanup()
 	for k,v in pairs(self.props) do
 		v:Remove()
 	end
+	self:SetNWVar("props", self.props)
+end
+
+function arenameta:GetTeam(name)
+	return self.teams[name]
 end
 
 function arenameta:IsValid()
@@ -197,6 +237,7 @@ hook.Add("PlayerSpawnedProp", "PK_Arena_PlayerSpawnedProp", function(ply, model,
 	if IsValid(arena) then
 		ent.arena = arena
 		table.insert(arena.props, ent:EntIndex(), ent)
+		arena:UpdateNWTable("props", ent:EntIndex(), ent)
 	end
 end)
 
@@ -205,14 +246,20 @@ hook.Add("EntityRemoved", "PK_Arena_EntityRemoved", function(ent)
 
 	if IsValid(arena) then
 		arena.props[ent:EntIndex()] = nil
+		arena:UpdateNWTable("props", ent:EntIndex(), nil)
 	end
 end)
 
+arena1 = arena1 or (function()
+	local arena = PK.NewArena()
+	table.insert(PK.arenas, arena)
+	return arena
+end)()
 
-
-arena1 = arena1 or PK.NewArena()
-arena2 = arena2 or PK.NewArena()
 game1 = PK.NewGamemode("oog")
+
+game1:CreateTeam("team1", Color(255,0,0))
+game1:CreateTeam("team2", Color(0,255,0))
 
 game1:AddRound("test", 10, function(arena)
 	for k,v in pairs(arena.players) do
@@ -246,6 +293,7 @@ game1:Hook("InitializeGame", "game1_initializegame", function(arena)
 	game1:StartRound("test", arena, function(arena)
 		for k,v in pairs(arena.players) do
 			//v:Spawn()
+			local team1 = arena:GetTeam("team1")
 			team1:AddPoints(5)
 			team1:AddPoints(-2)
 			v:ChatPrint("Warmup started " .. team1:TotalFrags() .. " " .. team1:TotalDeaths() .. " " .. team1:GetPoints())
@@ -254,7 +302,6 @@ game1:Hook("InitializeGame", "game1_initializegame", function(arena)
 end)
 
 arena1:SetGamemode(game1, true)
-arena2:SetGamemode(game1, true)
 
 /*
 

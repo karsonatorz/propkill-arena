@@ -48,7 +48,7 @@ function gamemeta:CreateTeam(name, color)
 		name = name,
 		color = color or Color(),
 	}
-	self.teams[name] = setmetatable(teamtemplate, PK.teammeta)
+	self.teams[name] = teamtemplate
 
 	return self.teams[name]
 end

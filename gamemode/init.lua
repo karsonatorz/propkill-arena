@@ -37,6 +37,7 @@ AddCSLuaFile("client/arena/gamemodes.lua")
 AddCSLuaFile("client/arena/rounds.lua")
 AddCSLuaFile("client/arena/teams.lua")
 AddCSLuaFile("client/arena/hooks.lua")
+AddCSLuaFile("client/arena/net.lua")
 
 // Settings
 AddCSLuaFile("client/settings/view.lua")

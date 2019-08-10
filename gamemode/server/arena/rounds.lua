@@ -10,33 +10,34 @@ function gamemeta:AddRound(roundName, time, callbackFinish)
 end
 
 function gamemeta:StartRound(roundName, arena, startCallback)
-	arena.gmvars.round.currentSubRound = 1
+	arena.round.currentRound = roundName
+	arena.round.currentSubRound = 1
 
 	self:AdvanceRound(roundName, arena)
 
 	if startCallback != nil then
-		startCallback(roundName, arena)
+		startCallback(arena)
 	end
 
 end
 
 function gamemeta:AdvanceRound(roundName, arena)
-	local name = tostring(arena) .. roundName .. arena.gmvars.round.currentSubRound
+	local name = tostring(arena) .. roundName .. arena.round.currentSubRound
 
-	timer.Create(name, arena.gmvars.round[roundName][arena.gmvars.round.currentSubRound].time, 1, function()
-		arena.gmvars.round[roundName][arena.gmvars.round.currentSubRound].callback(arena)
+	timer.Create(name, arena.round[roundName][arena.round.currentSubRound].time, 1, function()
+		arena.round[roundName][arena.round.currentSubRound].callback(arena)
 
-		if #arena.gmvars.round[roundName] > arena.gmvars.round.currentSubRound then
-			arena.gmvars.round.currentSubRound = arena.gmvars.round.currentSubRound + 1
+		if #arena.round[roundName] > arena.round.currentSubRound then
+			arena.round.currentSubRound = arena.round.currentSubRound + 1
 			self:AdvanceRound(roundName, arena)
 		end
 	end)
 
-	arena.gmvars.round.currentRound = name
+	arena.round.currentRound = roundName
 end
 
 function gamemeta:AbortRound(roundName, arena)
-	timer.Remove(arena.gmvars.round.currentRound)
-	arena.gmvars.round[roundName][arena.gmvars.round.currentSubRound].callback(arena)
+	timer.Remove(arena.round.currentRound)
+	arena.round[roundName][arena.round.currentSubRound].callback(arena)
 end
 

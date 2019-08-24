@@ -3,28 +3,36 @@ teammeta.__index = teammeta
 
 PK.teammeta = teammeta
 
-function teammeta:AddPlayer(ply)
-	if not IsValid(ply) or not ply:IsPlayer() then return false end
+function teammeta:AddPlayer(arena, ply)
+	if not IsValid(ply) or not ply:IsPlayer() or not IsValid(arena) then return false end
 
 	self.players[ply:UserID()] = ply
 	ply.team = self
 
+	arena:NWTeamPlayer(ply, self.name)
+
 	return true
 end
 
-function teammeta:RemovePlayer(ply)
-	if not IsValid(ply) or not ply:IsPlayer() then return end
+function teammeta:RemovePlayer(arena, ply)
+	if not IsValid(ply) or not ply:IsPlayer() or not IsValid(arena) then return end
 
 	self.players[ply:UserID()] = nil
 	ply.team = nil
+
+	arena:NWTeamPlayer(ply, self.name, true)
 end
 
-function teammeta:AddPoints(amount)
+function teammeta:AddPoints(arena, amount)
+	if not IsValid(arena) then return end
+
 	self.points = self.points + (amount or 1)
+
+	arena:NWTeamVar(self.name, "points", self.points)
 end
 
 function teammeta:GetPoints()
-	return self.points
+	return self.points or 0
 end
 
 function teammeta:TotalFrags()

@@ -21,7 +21,7 @@ net.Receive("PK_Config_Set", function(len, ply)
 	if ply:IsSuperAdmin() then
 		local setting = net.ReadString()
 		local value = net.ReadTable()[1]
-		print("SET " .. setting .. " TO " .. tostring(value))
+		dprint("SET " .. setting .. " TO " .. tostring(value))
 		PK.Config:Set(setting, value)
 		if isfunction(PK.Config[setting]) then
 			PK.Config[setting]()

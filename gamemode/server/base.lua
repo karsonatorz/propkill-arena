@@ -35,6 +35,12 @@ function LogPrint(message)
 	MsgC(cwhite, "[Propkill]: ", cgrey, message .. "\n")
 end
 
+function dprint(...)
+	if PK.debug then
+		print(...)
+	end
+end
+
 function Notify(ply, message)
 	net.Start("pk_notify")
 		net.WriteString(message)

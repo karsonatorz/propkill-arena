@@ -7,6 +7,7 @@ GM.TeamBased = false
 DeriveGamemode("sandbox")
 
 PK = PK or {
+	debug = true, // enable or disable debug prints
 	config = {},
 	arenas = {},
 	gamemodes = {},

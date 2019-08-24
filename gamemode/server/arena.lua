@@ -3,6 +3,7 @@ arenameta.__index = arenameta
 
 PK.arenameta = arenameta
 
+arenameta.team = {}
 arenameta.spawns = {
 	ffa = {
 		{ pos = Vector(6596.689453, -4628.974609, 471.107269), ang = Angle(0, -90, 0) },
@@ -48,7 +49,7 @@ function arenameta:AddPlayer(ply)
 
 	local canjoin, reason = self:CallGMHook("PlayerJoinArena", ply)
 	if not canjoin then
-		print(reason)
+		dprint(reason)
 		return false
 	end
 
@@ -59,8 +60,9 @@ function arenameta:AddPlayer(ply)
 	self.players[ply:UserID()] = ply
 	ply.arena = self
 
-	self:UpdateNWTable("players", ply:UserID(), ply)
+	self:NWPlayer(ply)
 	self:CallGMHook("PlayerJoinedArena", ply)
+	ply:SetNWString("arena", tostring(self))
 
 	ply:Spawn()
 
@@ -81,7 +83,10 @@ function arenameta:RemovePlayer(ply, silent)
 	ply.arena = nil
 	self.players[ply:UserID()] = nil
 
-	self:UpdateNWTable("players", ply:UserID(), nil)
+	self:NWPlayer(ply, true)
+	ply:SetNWString("arena", nil)
+
+	ply:Spawn()
 end
 
 
@@ -109,8 +114,9 @@ function arenameta:SetGamemode(gm, keepPlayers)
 	self:GamemodeCleanup()
 	self.gamemode = gm
 
-	// initialize all the hooks from the gamemode
+	// initialize all the users hooks from the gamemode
 	for k,v in pairs(gm.userHooks) do
+		// check that it isnt an arena hook
 		if gm.hooks.customHooks[k] == nil then
 			self.hooks[k] = tostring(self)
 
@@ -185,8 +191,8 @@ function arenameta:GetInfo()
 		props = self.props,
 		teams = self.teams,
 		round = {
-			self.round.currentRound or "",
-			self.round.currentSubRound or "",
+			currentRound = self.round.currentRound or "",
+			subRound = self.round.currentSubRound or "",
 		},
 		gamemode = {
 			name = self.gamemode.name or "",
@@ -237,7 +243,7 @@ hook.Add("PlayerSpawnedProp", "PK_Arena_PlayerSpawnedProp", function(ply, model,
 	if IsValid(arena) then
 		ent.arena = arena
 		table.insert(arena.props, ent:EntIndex(), ent)
-		arena:UpdateNWTable("props", ent:EntIndex(), ent)
+		arena:NWProp(ent)
 	end
 end)
 
@@ -246,7 +252,7 @@ hook.Add("EntityRemoved", "PK_Arena_EntityRemoved", function(ent)
 
 	if IsValid(arena) then
 		arena.props[ent:EntIndex()] = nil
-		arena:UpdateNWTable("props", ent:EntIndex(), nil)
+		arena:NWProp(ent, true)
 	end
 end)
 
@@ -255,6 +261,8 @@ arena1 = arena1 or (function()
 	table.insert(PK.arenas, arena)
 	return arena
 end)()
+
+arena1 = setmetatable(arena1, PK.arenameta)
 
 game1 = PK.NewGamemode("oog")
 
@@ -283,6 +291,8 @@ game1:Hook("PlayerSpawn", "game1_playerpsawn", function(arena, ply)
 end)
 
 game1:Hook("PlayerJoinedArena", "asdasd", function(arena, ply)
+	local team1 = arena:GetTeam("team1")
+	team1:AddPlayer(ply)
 	for k,v in pairs(arena.players) do
 		v:ChatPrint(ply:Nick() .. " joined")
 	end
@@ -294,65 +304,11 @@ game1:Hook("InitializeGame", "game1_initializegame", function(arena)
 		for k,v in pairs(arena.players) do
 			//v:Spawn()
 			local team1 = arena:GetTeam("team1")
-			team1:AddPoints(5)
-			team1:AddPoints(-2)
+			team1:AddPoints(arena, 5)
+			team1:AddPoints(arena, -2)
 			v:ChatPrint("Warmup started " .. team1:TotalFrags() .. " " .. team1:TotalDeaths() .. " " .. team1:GetPoints())
 		end
 	end)
 end)
 
 arena1:SetGamemode(game1, true)
-
-/*
-
-arena1 = PK.NewArena()
-arena2 = PK.NewArena()
-
-game1 = PK.NewGamemode("oog")
-
-team1 = game1:CreateTeam("Team1", Color(255,0,0))
-team2 = game1:CreateTeam("Team2", Color(0,255,0))
-
-game1:AddRound("test", 10, function(arena)
-	for k,v in pairs(arena.players) do
-		//v:Spawn()
-		v:ChatPrint("Warmup over")
-		v:ChatPrint("Game starting")
-	end
-	//arena:Cleanup()
-end)
-
-game1:AddRound("test", 30, function(arena)
-	for k,v in pairs(arena.players) do
-		v:ChatPrint("Game over!")
-	end
-end)
-
-game1:Hook("PlayerJoinedArena", "PK_Arena_PlayerJoined", function(arena, ply)
-	ply:ChatPrint("Welcome to " .. arena.name .. ", now playing " .. game1.name or "gamemode")
-end)
-
-game1:Hook("PlayerSpawn", "game1_playerpsawn", function(arena, ply)
-	if math.Round(math.random(0,1)) then
-		team1:AddPlayer()
-	else
-		team2:AddPlayer()
-	end
-	local spawn = math.random(1, #arena.spawns.ffa)
-	ply:SetPos(arena.spawns.ffa[spawn].pos)
-	ply:SetEyeAngles(arena.spawns.ffa[spawn].ang)
-end)
-
-game1:Hook("InitializeGame", "game1_initializegame", function(arena)
-	game1:StartRound("test", function(arena)
-		for k,v in pairs(arena.players) do
-			//v:Spawn()
-			team1:AddPoints(5)
-			team1:AddPoints(-2)
-			v:ChatPrint("Warmup started " .. team1:TotalFrags() .. " " .. team1:TotalDeaths() .. " " .. team1:GetPoints())
-		end
-	end)
-end)
-
-
-arena1:SetGamemode(game1)*/

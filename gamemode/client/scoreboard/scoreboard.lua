@@ -55,11 +55,11 @@ local function Scoreboard(parent)
 			colwidth = colwidth - 8
 		end
 
-		col1:SetWidth(colwidth * 0.40)
-		col2:SetWidth(colwidth * 0.15)
-		col3:SetWidth(colwidth * 0.15)
-		col4:SetWidth(colwidth * 0.15)
-		col5:SetWidth(colwidth * 0.15+4)
+		col1:SetWidth(colwidth * 0.52)
+		col2:SetWidth(colwidth * 0.12)
+		col3:SetWidth(colwidth * 0.12)
+		col4:SetWidth(colwidth * 0.12)
+		col5:SetWidth(colwidth * 0.12+4)
 	end
 
 	local teams = vgui.Create("DIconLayout", scroll)
@@ -136,11 +136,11 @@ local function Scoreboard(parent)
 					local colwidth = self:GetParent():GetWide()
 
 					self:SetWidth(colwidth)
-					name:SetWidth(colwidth * 0.40)
-					kills:SetWidth(colwidth * 0.15)
-					deaths:SetWidth(colwidth * 0.15)
-					elo:SetWidth(colwidth * 0.15)
-					ping:SetWidth(colwidth * 0.15)
+					name:SetWidth(colwidth * 0.52)
+					kills:SetWidth(colwidth * 0.12)
+					deaths:SetWidth(colwidth * 0.12)
+					elo:SetWidth(colwidth * 0.12)
+					ping:SetWidth(colwidth * 0.12)
 				end
 			end
 

@@ -48,7 +48,7 @@ function PKAPI:GetPlayerData(ply)
 			ply:SetNWInt("TotalDeaths", data["Deaths"])
 			ply:SetNWInt("Elo", data["Elo"])
 		end,
-		function(result) print(result) end
+		function(result) dprint(result) end
 	)
 end
 
@@ -73,7 +73,7 @@ function PKAPI:GetActivePlayersData()
 				ply:SetNWInt("Elo", v["Elo"])
 			end
 		end,
-		function(result) print(result) end
+		function(result) dprint(result) end
 	)
 end
 
@@ -112,12 +112,11 @@ function PKAPI:AddInt(ply, name)
 end
 
 function PKAPI:ChangeInt(ply, name, number)
-	print("set elo")
 	if not self.queue.Players[ply:SteamID()] then
 		self.queue.Players[ply:SteamID()] = {}
 		self.queue.Players[ply:SteamID()][name] = number
 	else
-		self.queue.Players[ply:SteamID()][name] = self.queue.Players[ply:SteamID()][name] + number
+		self.queue.Players[ply:SteamID()][name] = (self.queue.Players[ply:SteamID()][name] or 0) + number
 	end
 end
 

@@ -61,7 +61,6 @@ function PK.CreateMenu()
 	end
 	function frame.btnClose.DoClick()
 		isopen = false
-		RememberCursorPosition()
 		gui.EnableScreenClicker(false)
 		frame:ShowCloseButton(false)
 		frame:Hide()
@@ -188,17 +187,22 @@ function GM:ScoreboardShow()
 	if CurTime() - lastopen < 0.25 then
 		isopen = true
 		PK.menu:ShowCloseButton(true)
+		gui.EnableScreenClicker(true)
 	end
-
+	
 	lastopen = CurTime()
-	gui.EnableScreenClicker(true)
-	RestoreCursorPosition()
 end
 
 function GM:ScoreboardHide()
 	if not isopen then
 		PK.menu:Hide()
-		RememberCursorPosition()
-		gui.EnableScreenClicker(false)
 	end
 end
+
+hook.Add("CreateMove", "enablemouseonclick", function()
+	if input.WasMousePressed(MOUSE_LEFT) and PK.menu:IsVisible() then
+		isopen = true
+		PK.menu:ShowCloseButton(true)
+		gui.EnableScreenClicker(true)
+	end
+end )

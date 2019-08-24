@@ -1,16 +1,19 @@
 local gamemeta = PK.gamemeta
 
 function gamemeta:Hook(event, uniqueid, func)
-	if self.userHooks[event] == nil then
-		error("Attempt to hook non-existent arena hook", 2)
-		return
-	end
+	if self.userHooks[event] == nil then return end
 
 	self.userHooks[event][uniqueid] = func
 end
 
-function gamemeta:HookRemove(event, uniqueid)
+function gamemeta:HookRemove(event, uniqueid, arena)
+	if event == nil or uniqueid == nil then return end
+
 	self.userHooks[event][uniqueid] = nil
+
+	if IsValid(arena) then
+		arena.hook[event][uniqueid] = nil
+	end
 end
 
 /*
@@ -45,6 +48,12 @@ end
 function gamemeta.hooks.customHooks.PlayerLeaveArena(arena, ply)
 	for k,v in pairs(arena.gamemode.userHooks.PlayerLeaveArena) do
 		v(arena, ply)
+	end
+end
+
+function gamemeta.hooks.customHooks.PlayerChangedTeam(arena, ply, newTeam, oldTeam)
+	for k,v in pairs(arena.gamemode.userHooks.PlayerChangedTeam) do
+		v(arena, ply, newTeam, oldTeam)
 	end
 end
 

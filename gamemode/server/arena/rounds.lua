@@ -1,6 +1,7 @@
 local gamemeta = PK.gamemeta
 
 function gamemeta:AddRound(roundName, time, callbackFinish)
+	if roundName == nil or time == nil then error(roundName and "time is nil" or "round name is nil", 2) end
 	if self.round[roundName] == nil then self.round[roundName] = {} end
 
 	table.insert(self.round[roundName], {
@@ -10,6 +11,7 @@ function gamemeta:AddRound(roundName, time, callbackFinish)
 end
 
 function gamemeta:StartRound(roundName, arena, startCallback)
+	if roundName == nil or arena == nil then error(roundName and "arena is nil" or "round name is nil", 2) end
 	arena.round.currentRound = roundName
 	arena.round.currentSubRound = 1
 

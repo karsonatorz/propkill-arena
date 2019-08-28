@@ -30,7 +30,6 @@ surface.CreateFont("pk_playerfont", {
 	antialias = true,
 })
 
-local lastopen = CurTime()
 local isopen = false
 
 colors = {
@@ -98,45 +97,24 @@ function PK.CreateMenu()
 		draw.RoundedBox(0, 0, 30, w, h-30, colors.primaryAlt)
 	end
 
-	local panel1 = vgui.Create("DPanel", tabs)
-	function panel1:Paint(w, h)
-		//draw.RoundedBox(0, 0, 0, w, h, colors.primary)
-	end
-	local sheet = tabs:AddSheet("Scoreboard", panel1)
-	sheet.Panel:DockMargin(8,8,8,8)
-	sheet.Panel:Dock(FILL)
-	local Scoreboard = include("scoreboard.lua")
-	local RefreshScoreboard = Scoreboard(panel1)
-
-	local panel2 = vgui.Create("DPanel", tabs)
-	function panel2:Paint(w, h)
-		//draw.RoundedBox(0, 0, 0, w, h, colors.primaryAlt)
-	end
-	sheet = tabs:AddSheet("Arenas", panel2)
+	Scoreboard = vgui.CreateFromTable(include("scoreboard.lua"), tabs)
+	local sheet = tabs:AddSheet("Scoreboard", Scoreboard)
 	sheet.Panel:DockMargin(4,4,4,4)
 	sheet.Panel:Dock(FILL)
 
-	local panel3 = vgui.Create("DPanel", tabs)
-	function panel3:Paint(w, h)
-		//draw.RoundedBox(0, 0, 0, w, h, colors.primaryAlt)
-	end
-	sheet = tabs:AddSheet("Duel", panel3)
+	sheet = tabs:AddSheet("Arenas", vgui.CreateFromTable(include("arenas.lua"), tabs))
 	sheet.Panel:DockMargin(4,4,4,4)
 	sheet.Panel:Dock(FILL)
 
-	local panel4 = vgui.Create("DPanel", tabs)
-	function panel4:Paint(w, h)
-		//draw.RoundedBox(0, 0, 0, w, h, colors.primaryAlt)
-	end
-	sheet = tabs:AddSheet("Leaderboards", panel4)
+	sheet = tabs:AddSheet("Duel", vgui.CreateFromTable(include("duel.lua"), tabs))
 	sheet.Panel:DockMargin(4,4,4,4)
 	sheet.Panel:Dock(FILL)
 
-	local panel5 = vgui.Create("PK.Settings", tabs)
-	function panel5:Paint(w, h)
-		//draw.RoundedBox(0, 0, 0, w, h, colors.primaryAlt)
-	end
-	sheet = tabs:AddSheet("Settings", panel5)
+	sheet = tabs:AddSheet("Leaderboard", vgui.CreateFromTable(include("leaderboard.lua"), tabs))
+	sheet.Panel:DockMargin(4,4,4,4)
+	sheet.Panel:Dock(FILL)
+
+	sheet = tabs:AddSheet("Settings", vgui.CreateFromTable(include("settings.lua"), tabs))
 	sheet.Panel:DockMargin(4,4,4,4)
 	sheet.Panel:Dock(FILL)
 
@@ -172,7 +150,7 @@ function PK.CreateMenu()
 	end
 
 	function frame:Show()
-		RefreshScoreboard()
+		Scoreboard:Refresh()
 		self:SetVisible(true)
 	end
 
@@ -183,14 +161,6 @@ PK.menu = PK.CreateMenu()
 
 function GM:ScoreboardShow()
 	PK.menu:Show()
-
-	if CurTime() - lastopen < 0.25 then
-		isopen = true
-		PK.menu:ShowCloseButton(true)
-		gui.EnableScreenClicker(true)
-	end
-	
-	lastopen = CurTime()
 end
 
 function GM:ScoreboardHide()
@@ -200,7 +170,7 @@ function GM:ScoreboardHide()
 end
 
 hook.Add("CreateMove", "enablemouseonclick", function()
-	if input.WasMousePressed(MOUSE_LEFT) and PK.menu:IsVisible() then
+	if (input.WasMousePressed(MOUSE_LEFT) or input.WasMousePressed(MOUSE_RIGHT)) and PK.menu:IsVisible() then
 		isopen = true
 		PK.menu:ShowCloseButton(true)
 		gui.EnableScreenClicker(true)

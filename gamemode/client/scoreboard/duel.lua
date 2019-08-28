@@ -1,4 +1,5 @@
 local PANEL = {}
+PANEL.Base = "DPanel"
 
 function PANEL:Init()
 	self:Dock(FILL)
@@ -43,7 +44,7 @@ function PANEL:Init()
 end
 
 function PANEL:Paint(w, h)
-	derma.SkinHook("Paint", "Tab", self, w, h)
+	
 end
 
-derma.DefineControl("PK.Duel", "Duel Panel of PK Menu", PANEL, "DScrollPanel")
+return PANEL

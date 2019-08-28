@@ -1,4 +1,5 @@
 local PANEL = {}
+PANEL.Base = "DColumnSheet"
 
 function PANEL:Init()
 	self:MakeSettings()
@@ -172,7 +173,7 @@ function PANEL:MakeSettings()
 end
 
 function PANEL:Paint(w, h)
-	derma.SkinHook("Paint", "Tab", self, w, h)
+	
 end
 
-derma.DefineControl("PK.Settings", "Settings of PK Menu", PANEL, "DColumnSheet")
+return PANEL

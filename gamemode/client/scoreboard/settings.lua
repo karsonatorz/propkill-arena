@@ -6,8 +6,9 @@ function PANEL:Init()
 end
 
 function PANEL:Refresh()
-	for k,v in pairs(self.settings) do
-		v:Remove()
+	for k,v in pairs(self.Items) do
+		v.Panel:Remove()
+		v.Button:Remove()
 	end
 	self:MakeSettings()
 end

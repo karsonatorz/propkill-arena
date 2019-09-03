@@ -30,6 +30,14 @@ surface.CreateFont("pk_playerfont", {
 	antialias = true,
 })
 
+surface.CreateFont("pk_arenafont", {
+	font = "Arial",
+	size = 18,
+	weight = 650,
+	antialias = true,
+	shadow = true,
+})
+
 local isopen = false
 
 colors = {
@@ -97,8 +105,7 @@ function PK.CreateMenu()
 		draw.RoundedBox(0, 0, 30, w, h-30, colors.primaryAlt)
 	end
 
-	Scoreboard = vgui.CreateFromTable(include("scoreboard.lua"), tabs)
-	local sheet = tabs:AddSheet("Scoreboard", Scoreboard)
+	local sheet = tabs:AddSheet("Scoreboard", vgui.CreateFromTable(include("scoreboard.lua"), tabs))
 	sheet.Panel:DockMargin(4,4,4,4)
 	sheet.Panel:Dock(FILL)
 
@@ -150,7 +157,11 @@ function PK.CreateMenu()
 	end
 
 	function frame:Show()
-		Scoreboard:Refresh()
+		for k,v in pairs(tabs.Items) do
+			if IsValid(v.Panel) and v.Panel.Refresh != nil then
+				v.Panel:Refresh()
+			end
+		end
 		self:SetVisible(true)
 	end
 

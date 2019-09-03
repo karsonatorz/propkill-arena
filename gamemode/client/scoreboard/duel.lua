@@ -43,6 +43,10 @@ function PANEL:Init()
 	end
 end
 
+function PANEL:Refresh()
+
+end
+
 function PANEL:Paint(w, h)
 	
 end

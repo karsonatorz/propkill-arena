@@ -18,12 +18,12 @@ arenameta.spawns = {
 include("arena/net.lua")
 include("arena/gamemodes.lua")
 
-function PK.NewArena(data)
-	local tbl = data or {}
+function PK.NewArena(name, maxplayers, icon)
 	local arenatemplate = {
-		name = tbl.name or "Arena" .. #PK.arenas + 1,
+		name = name or "Arena" .. #PK.arenas + 1,
 		//spawns = tbl.spawns or {},
-		maxplayers = 0,
+		maxplayers = maxplayers or 0,
+		icon = icon or "propkill/arena/downtown.png",
 		players = {},
 		props = {},
 		hooks = {},
@@ -36,10 +36,14 @@ function PK.NewArena(data)
 
 	local newarena = setmetatable(arenatemplate, arenameta)
 
-	//newarena.spawns = data.spawns or {}
-	//newarena.maxplayers = data.maxplayers or 0
-
+	PK.arenas[tostring(newarena)] = newarena
+	
 	return newarena
+end
+
+function PK.GetArena(id)
+	if type(id) != "string" then return end
+	return setmetatable(PK.arenas[id], arenameta)
 end
 
 // ==== Arena Player Management ==== \\
@@ -50,7 +54,7 @@ function arenameta:AddPlayer(ply)
 	local canjoin, reason = self:CallGMHook("PlayerJoinArena", ply)
 	if not canjoin then
 		dprint(reason)
-		return false
+		return false, reason
 	end
 
 	if IsValid(ply.arena) then
@@ -186,6 +190,7 @@ end
 function arenameta:GetInfo()
 	local data = {
 		name = self.name,
+		icon = self.icon,
 		maxplayers = self.maxplayers,
 		players = self.players,
 		props = self.props,
@@ -257,9 +262,7 @@ hook.Add("EntityRemoved", "PK_Arena_EntityRemoved", function(ent)
 end)
 
 arena1 = arena1 or (function()
-	local arena = PK.NewArena()
-	table.insert(PK.arenas, arena)
-	return arena
+	return PK.NewArena("testarena", 0, "propkill/arena/testmap.png")
 end)()
 
 arena1 = setmetatable(arena1, PK.arenameta)

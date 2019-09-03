@@ -33,7 +33,7 @@ AddCSLuaFile("client/arena.lua")
 AddCSLuaFile("shared/entity.lua")
 AddCSLuaFile("shared/networking.lua")
 
-
+// Arena
 AddCSLuaFile("client/arena/gamemodes.lua")
 AddCSLuaFile("client/arena/rounds.lua")
 AddCSLuaFile("client/arena/teams.lua")
@@ -52,6 +52,11 @@ AddCSLuaFile("client/scoreboard/leaderboard.lua")
 AddCSLuaFile("client/scoreboard/settings.lua")
 AddCSLuaFile("client/scoreboard/duel.lua")
 
+
+resource.AddFile("materials/propkill/arena/downtown.png")
+resource.AddFile("materials/propkill/arena/testmap.png")
+resource.AddFile("materials/propkill/arena/joust.png")
+resource.AddFile("materials/propkill/arena/flatgrass.png")
 
 /*------------------------------------------
 				Network Strings

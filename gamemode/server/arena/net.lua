@@ -5,6 +5,7 @@ util.AddNetworkString("PK_ArenaNetProp")
 util.AddNetworkString("PK_ArenaNetArena")
 util.AddNetworkString("PK_ArenaNetPlayer")
 util.AddNetworkString("PK_ArenaNetTeamVar")
+util.AddNetworkString("PK_ArenaNetJoinArena")
 util.AddNetworkString("PK_ArenaNetTeamPlayer")
 util.AddNetworkString("PK_ArenaNetInitialize")
 
@@ -81,4 +82,22 @@ net.Receive("PK_ArenaNetInitialize", function(len, ply)
 	net.Start("PK_ArenaNetInitialize")
 		net.WriteTable(tosend)
 	net.Send(ply)
+end)
+
+net.Receive("PK_ArenaNetJoinArena", function(len, ply)
+	if not IsValid(ply) or not ply:IsPlayer() then return end
+
+	local arenaid = net.ReadString()
+	print("server:", arenaid)
+	local arena = PK.arenas[arenaid]
+
+	if not IsValid(arena) then dprint(ply:Nick(), "attempted to join invalid arena") return end
+
+	local canjoin, reason = arena:AddPlayer(ply)
+
+	net.Start("PK_ArenaNetJoinArena")
+		net.WriteBool(canjoin)
+		net.WriteString(not canjoin and reason or "")
+	net.Send(ply)
+
 end)

@@ -91,3 +91,13 @@ net.Receive("PK_ArenaNetProp", function()
 		table.insert(PK.arenas[arena].props, ent, Entity(ent))
 	end
 end)
+
+net.Receive("PK_ArenaNetJoinArena", function()
+	local canjoin = net.ReadBool()
+	local reason = net.ReadString()
+
+	if not canjoin then
+		chat.AddText(Color(255,255,255), "Failed to join arena: " .. reason)
+	end
+
+end)

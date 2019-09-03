@@ -23,3 +23,7 @@ end
 function arenameta:TotalFrags(name)
 	return setmetatable(self.teams[name], PK.teammeta)
 end
+
+function arenameta:IsValid()
+	return true 
+end

@@ -123,7 +123,7 @@ function arenameta:SetGamemode(gm, keepPlayers)
 
 	// setup teams
 	for k,v in pairs(gm.teams) do
-		self.teams[k] = setmetatable(v, PK.teammeta)
+		self.teams[k] = setmetatable(table.Copy(v), PK.teammeta)
 	end
 
 	// tell the gamemode to initialize

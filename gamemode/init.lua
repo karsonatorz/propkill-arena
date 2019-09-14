@@ -81,8 +81,6 @@ function GM:Initialize()
 	LogPrint("Initializing...")
 end
 
-local pk_gminitialized = pk_gminitialized or false
-
 -- Show notification when lua is updated live
 if pk_gminitialized and !timer.Exists("PK_UpdateAntiSpam") then
 	ChatMsg({Color(0,200,0), "[PK:R]: ", Color(200,200,200), "Gamemode was updated!"})

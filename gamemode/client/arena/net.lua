@@ -34,7 +34,7 @@ end)
 net.Receive("PK_ArenaNetPlayer", function()
 	local arena = net.ReadString()
 	local remove = net.ReadBool()
-	local plyid = net.ReadInt(16)
+	local plyid = net.ReadInt(32)
 	local ply = Entity(plyid)
 
 	if PK.arenas[arena] == nil then
@@ -45,7 +45,7 @@ net.Receive("PK_ArenaNetPlayer", function()
 	if remove then
 		PK.arenas[arena].players[plyid] = nil
 	elseif IsValid(ply) then
-		table.insert(PK.arenas[arena].players, plyid, ply)
+		PK.arenas[arena].players[plyid] = ply
 	end
 end)
 
@@ -53,12 +53,11 @@ net.Receive("PK_ArenaNetTeamPlayer", function()
 	local arena = net.ReadString()
 	local team = net.ReadString()
 	local remove = net.ReadBool()
-	local plyid = net.ReadInt(16)
+	local plyid = net.ReadInt(32)
 	local ply = Entity(plyid)
-	PrintTable({arena = arena, team = team, remove = remove, plyid = plyid, ply = ply})
 
-	if PK.arenas[arena] == nil then
-		PK.arenas[arena] = {}
+	if PK.arenas[arena] == nil then return end
+	if PK.arenas[arena].teams == nil then
 		PK.arenas[arena].teams = {}
 		PK.arenas[arena].teams[team] = {}
 		PK.arenas[arena].teams[team].players = {}
@@ -67,7 +66,7 @@ net.Receive("PK_ArenaNetTeamPlayer", function()
 	if remove then
 		PK.arenas[arena].teams[team].players[plyid] = nil
 	elseif IsValid(ply) then
-		table.insert(PK.arenas[arena].teams[team].players, plyid, ply)
+		PK.arenas[arena].teams[team].players[plyid] = ply
 	end
 end)
 
@@ -89,7 +88,7 @@ end)
 net.Receive("PK_ArenaNetProp", function()
 	local arena = net.ReadString()
 	local remove = net.ReadBool()
-	local ent = net.ReadInt(16)
+	local ent = net.ReadInt(32)
 
 	if PK.arenas[arena] == nil then
 		PK.arenas[arena] = {}
@@ -99,7 +98,7 @@ net.Receive("PK_ArenaNetProp", function()
 	if remove then
 		PK.arenas[arena].props[ent] = nil
 	else
-		table.insert(PK.arenas[arena].props, ent, Entity(ent))
+		PK.arenas[arena].props[ent] = Entity(ent)
 	end
 end)
 

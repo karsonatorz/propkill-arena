@@ -32,3 +32,9 @@ hook.Add("ShouldCollide", "ss_noteamcollide", function(ent,ent2)
 		return false
 	end
 end)
+
+concommand.Add("arena_table", function()
+	for k,v in pairs(PK.arenas) do
+		PrintTable({v:GetInfo()})
+	end
+end)

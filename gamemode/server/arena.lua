@@ -1,29 +1,14 @@
-local arenameta = {}
-arenameta.__index = arenameta
+include("arena/meta.lua")
+include("arena/defaults.lua")
 
-PK.arenameta = arenameta
+local arenaDir = "pk_arenas"
 
-arenameta.team = {}
-arenameta.spawns = {
-	ffa = {
-		{ pos = Vector(6596.689453, -4628.974609, 471.107269), ang = Angle(0, -90, 0) },
-		{ pos = Vector(7318.069824, -14784.813477, 471.107269), ang = Angle(0, 90, 0) },
-	},
-	duel = {
-		{ pos = Vector(6596.689453, -4628.974609, 471.107269), ang = Angle(0, -90, 0) },
-		{ pos = Vector(7318.069824, -14784.813477, 471.107269), ang = Angle(0, 90, 0) },
-	}
-}
-
-include("arena/net.lua")
-include("arena/gamemodes.lua")
-
-function PK.NewArena(name, maxplayers, icon)
+local function setupNewArena()
 	local arenatemplate = {
-		name = name or "Arena" .. #PK.arenas + 1,
-		//spawns = tbl.spawns or {},
-		maxplayers = maxplayers or 0,
-		icon = icon or "propkill/arena/downtown.png",
+		name = "Arena" .. #PK.arenas + 1,
+		//spawns = {},
+		maxplayers = 0,
+		icon = "propkill/arena/downtown.png",
 		players = {},
 		props = {},
 		hooks = {},
@@ -32,286 +17,93 @@ function PK.NewArena(name, maxplayers, icon)
 		teams = {},
 		gamemode = {},
 		gmvars = {},
+		autoload = false,
 	}
 
-	local newarena = setmetatable(arenatemplate, arenameta)
+	return setmetatable(arenatemplate, PK.arenameta)
+end
 
-	PK.arenas[tostring(newarena)] = newarena
+function PK.NewArena(data)
+	local arena = setupNewArena()
+
+	if type(data) == "table" then
+		local gm = PK.gamemodes[data.gamemode]
+		data.gamemode = nil
+
+		for k,v in pairs(data) do
+			arena[k] = v
+		end
+		print(gm)
+		if IsValid(gm) then
+			arena:SetGamemode(gm)
+		end
+	end
+
+	PK.arenas[tostring(arena)] = arena
+	arena:NWArena()
 	
-	return newarena
+	return arena
 end
 
-function PK.GetArena(id)
-	if type(id) != "string" then return end
-	return setmetatable(PK.arenas[id], arenameta)
+local function cleanFileName(name)
+	if name == nil then error("name is nil") end
+	if #name > 64 or #name < 2 then error("bad name length") end
+	
+	local filename = ""
+	for k,v in string.gmatch(name, "([%w-+_ ,.']*)") do
+		filename = filename .. k
+	end
+
+	return filename
 end
 
-// ==== Arena Player Management ==== \\
-
-function arenameta:AddPlayer(ply)
-	if not IsValid(ply) or not ply:IsPlayer() then return false end
-
-	local canjoin, reason = self:CallGMHook("PlayerJoinArena", ply)
-	if not canjoin then
-		dprint(reason)
-		return false, reason
+local function checkArenaFolders()
+	if not file.IsDir(arenaDir, "DATA") or not file.IsDir(arenaDir .. "/" .. cleanFileName(game.GetMap()), "DATA") then
+		file.Delete(arenaDir)
+		file.CreateDir(arenaDir)
+		file.CreateDir(arenaDir .. "/" .. cleanFileName(game.GetMap()))
 	end
-
-	if IsValid(ply.arena) then
-		ply.arena:RemovePlayer(ply)
-	end
-
-	self.players[ply:UserID()] = ply
-	ply.arena = self
-
-	self:NWPlayer(ply)
-	self:CallGMHook("PlayerJoinedArena", ply)
-	ply:SetNWString("arena", tostring(self))
-
-	ply:Spawn()
-
-	return true
 end
 
-function arenameta:RemovePlayer(ply, silent)
-	if ply.arena == nil then return end
+function PK.SaveArena(arena)
+	if not IsValid(arena) then return end
 
-	if not silent then
-		self:CallGMHook("PlayerLeaveArena", ply)
-	end
-
-	if IsValid(ply.team) then
-		ply.team:RemovePlayer(ply)
-	end
-
-	ply.arena = nil
-	self.players[ply:UserID()] = nil
-
-	self:NWPlayer(ply, true)
-	ply:SetNWString("arena", nil)
-
-	ply:Spawn()
+	checkArenaFolders()
+	local data = arena:GetData()
+	print(arenaDir .. "/" .. cleanFileName(game.GetMap()) .. "/" .. cleanFileName(data.name) .. ".txt")
+	file.Write(arenaDir .. "/" .. cleanFileName(game.GetMap()) .. "/" .. cleanFileName(data.name) .. ".txt", util.TableToJSON(data, true))
 end
 
+function PK.LoadArena(name, map)
+	if name == nil then return end
 
-// ==== Arena Hooks ==== \\
+	local data = util.JSONToTable(file.Read(arenaDir .. "/" .. cleanFileName(map or game.GetMap()) .. "/" .. cleanFileName(name) .. ".txt", "DATA"))
+	local arena = PK.NewArena(data)
 
-function arenameta:CallGMHook(event, ...)
-	local gm = self.gamemode
-	if not IsValid(gm) then return false end
-
-	if gm.hooks.customHooks[event] == nil then
-		error("Attempt to call non-existent gamemode hook", 2)
-		return
-	end
-
-	return gm.hooks.customHooks[event](self, ...)
+	return arena
 end
 
+function PK.LoadArenas(map)
+	local files = file.Find(arenaDir .. "/" .. cleanFileName(map or game.GetMap()) .. "/" .. "*.txt", "DATA")
 
-// ==== Arena Gamemode ==== \\
+	for k,v in pairs(files) do
+		local data = util.JSONToTable(file.Read(arenaDir .. "/" .. cleanFileName(map or game.GetMap()) .. "/" .. v, "DATA"))
 
-function arenameta:SetGamemode(gm, keepPlayers)
-	if not IsValid(gm) then return end
-
-	// cleanup anything left from the previous gamemode
-	self:GamemodeCleanup()
-	self.gamemode = gm
-
-	// initialize all the users hooks from the gamemode
-	for k,v in pairs(gm.userHooks) do
-		// check that it isnt an arena hook
-		if gm.hooks.customHooks[k] == nil then
-			self.hooks[k] = tostring(self)
-
-			hook.Add(k, tostring(self), function(ply, ...)
-				if not IsValid(self) then return end
-				if ply.arena != self then return end
-
-				for kk, vv in pairs(v) do
-					local ret = vv(self, ply, ...)
-					
-					if type(ret) != "nil" then
-						return ret
-					end
-				end
-			end)
+		if data.autoload then
+			PK.NewArena(data)
 		end
 	end
-
-	// setup rounds
-	for k,v in pairs(gm.round) do
-		self.round[k] = v
-	end
-
-	// setup teams
-	for k,v in pairs(gm.teams) do
-		self.teams[k] = setmetatable(v, PK.teammeta)
-	end
-
-	// tell the gamemode to initialize
-	self:CallGMHook("InitializeGame", v)
-
-	if keepPlayers then
-		for k,v in pairs(self.players) do
-			local canjoin, reason = self:CallGMHook("PlayerJoinArena", v)
-			if canjoin then
-				self:CallGMHook("PlayerJoinedArena", v)
-			end
-		end
-	else
-		for k,v in pairs(self.players) do
-			self:RemovePlayer(v)
-		end
-	end
-
-	self:SetNWVar("gamemode", self:GetInfo().gamemode)
 end
 
-function arenameta:GamemodeCleanup()
-	if IsValid(self.gamemode) then
-		self:CallGMHook("TerminateGame", v)
+hook.Add("InitPostEntity", "load autoload arenas", function()
+	//load gamemodes
+	local files, folders = file.Find(GAMEMODE.FolderName .. "/gamemodes/*", "LUA")
+	for k,v in pairs(files) do
+		include(GAMEMODE.FolderName .. "/gamemodes/" .. v)
+	end
+	for k,v in pairs(folders) do
+		include(GAMEMODE.FolderName .. "/gamemodes/" .. v .. "/init.lua")
 	end
 
-	self:Cleanup()
-
-	for k,v in pairs(self.hooks) do
-		hook.Remove(k, v)
-	end
-
-	self.gamemode = {}
-	self.gmvars = {}
-	self.round = {}
-	self.teams = {}
-end
-
-// ==== Arena Utility ==== \\
-
-function arenameta:GetInfo()
-	local data = {
-		name = self.name,
-		icon = self.icon,
-		maxplayers = self.maxplayers,
-		players = self.players,
-		props = self.props,
-		teams = self.teams,
-		round = {
-			currentRound = self.round.currentRound or "",
-			subRound = self.round.currentSubRound or "",
-		},
-		gamemode = {
-			name = self.gamemode.name or "",
-		},
-	}
-	return data
-end
-
-function arenameta:Cleanup()
-	for k,v in pairs(self.props) do
-		v:Remove()
-	end
-	self:SetNWVar("props", self.props)
-end
-
-function arenameta:GetTeam(name)
-	return self.teams[name]
-end
-
-function arenameta:IsValid()
-	return true
-end
-
-// ==== Arena Default Hooks ==== \\
-
-hook.Add("PlayerDisconnected", "PK_Arena_PlayerDisconnect", function(ply)
-	if IsValid(ply.arena) then
-		ply.arena:RemovePlayer(ply)
-	end
+	PK.LoadArenas()
 end)
-
-hook.Add("SetupPlayerVisibility", "PK_Arena_SetupPlayerVisibility", function(ply)
-	local arena = ply.arena
-
-	if IsValid(arena) then
-		for k,v in pairs(arena.players) do
-			AddOriginToPVS(v:GetPos())
-		end
-		for k,v in pairs(arena.props) do
-			AddOriginToPVS(v:GetPos())
-		end
-	end
-end)
-
-hook.Add("PlayerSpawnedProp", "PK_Arena_PlayerSpawnedProp", function(ply, model, ent)
-	local arena = ply.arena
-
-	if IsValid(arena) then
-		ent.arena = arena
-		table.insert(arena.props, ent:EntIndex(), ent)
-		arena:NWProp(ent)
-	end
-end)
-
-hook.Add("EntityRemoved", "PK_Arena_EntityRemoved", function(ent)
-	local arena = ent.arena
-
-	if IsValid(arena) then
-		arena.props[ent:EntIndex()] = nil
-		arena:NWProp(ent, true)
-	end
-end)
-
-arena1 = arena1 or (function()
-	return PK.NewArena("testarena", 0, "propkill/arena/testmap.png")
-end)()
-
-arena1 = setmetatable(arena1, PK.arenameta)
-
-game1 = PK.NewGamemode("oog")
-
-game1:CreateTeam("team1", Color(255,0,0))
-game1:CreateTeam("team2", Color(0,255,0))
-
-game1:AddRound("test", 10, function(arena)
-	for k,v in pairs(arena.players) do
-		//v:Spawn()
-		v:ChatPrint("Warmup over")
-		v:ChatPrint("Game starting")
-	end
-	//arena:Cleanup()
-end)
-
-game1:AddRound("test", 30, function(arena)
-	for k,v in pairs(arena.players) do
-		v:ChatPrint("Game over!")
-	end
-end)
-
-game1:Hook("PlayerSpawn", "game1_playerpsawn", function(arena, ply)
-	local spawn = math.random(1, #arena.spawns.ffa)
-	ply:SetPos(arena.spawns.ffa[spawn].pos)
-	ply:SetEyeAngles(arena.spawns.ffa[spawn].ang)
-end)
-
-game1:Hook("PlayerJoinedArena", "asdasd", function(arena, ply)
-	local team1 = arena:GetTeam("team1")
-	team1:AddPlayer(ply)
-	for k,v in pairs(arena.players) do
-		v:ChatPrint(ply:Nick() .. " joined")
-	end
-	ply:ChatPrint("welcome 2 " .. game1.name)
-end)
-
-game1:Hook("InitializeGame", "game1_initializegame", function(arena)
-	game1:StartRound("test", arena, function(arena)
-		for k,v in pairs(arena.players) do
-			//v:Spawn()
-			local team1 = arena:GetTeam("team1")
-			team1:AddPoints(arena, 5)
-			team1:AddPoints(arena, -2)
-			v:ChatPrint("Warmup started " .. team1:TotalFrags() .. " " .. team1:TotalDeaths() .. " " .. team1:GetPoints())
-		end
-	end)
-end)
-
-arena1:SetGamemode(game1, true)

@@ -79,11 +79,9 @@ util.AddNetworkString("PK_Config_Set")
 
 function GM:Initialize()
 	LogPrint("Initializing...")
-
-	if PK.config.arenas != nil then
-
-	end
 end
+
+local pk_gminitialized = pk_gminitialized or false
 
 -- Show notification when lua is updated live
 if pk_gminitialized and !timer.Exists("PK_UpdateAntiSpam") then

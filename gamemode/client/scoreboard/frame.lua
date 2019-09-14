@@ -40,6 +40,14 @@ surface.CreateFont("pk_arenafont", {
 
 local isopen = false
 
+local menutabs = {
+	{name = "Scoreboard", panel = include("scoreboard.lua")},
+	{name = "Arenas", panel = include("arenas.lua")},
+	{name = "Duel", panel = include("duel.lua")},
+	{name = "Leaderboard", panel = include("leaderboard.lua")},
+	{name = "Settings", panel = include("settings.lua")},
+}
+
 colors = {
 	primary = Color(48, 48, 47),
 	primaryAlt = Color(62, 62, 61),
@@ -71,6 +79,9 @@ function PK.CreateMenu()
 		gui.EnableScreenClicker(false)
 		frame:ShowCloseButton(false)
 		frame:Hide()
+	end
+	function frame:OnClose()
+		gui.EnableScreenClicker(false)
 	end
 
 	local top = vgui.Create("DPanel", frame)
@@ -105,25 +116,11 @@ function PK.CreateMenu()
 		draw.RoundedBox(0, 0, 30, w, h-30, colors.primaryAlt)
 	end
 
-	local sheet = tabs:AddSheet("Scoreboard", vgui.CreateFromTable(include("scoreboard.lua"), tabs))
-	sheet.Panel:DockMargin(4,4,4,4)
-	sheet.Panel:Dock(FILL)
-
-	sheet = tabs:AddSheet("Arenas", vgui.CreateFromTable(include("arenas.lua"), tabs))
-	sheet.Panel:DockMargin(4,4,4,4)
-	sheet.Panel:Dock(FILL)
-
-	sheet = tabs:AddSheet("Duel", vgui.CreateFromTable(include("duel.lua"), tabs))
-	sheet.Panel:DockMargin(4,4,4,4)
-	sheet.Panel:Dock(FILL)
-
-	sheet = tabs:AddSheet("Leaderboard", vgui.CreateFromTable(include("leaderboard.lua"), tabs))
-	sheet.Panel:DockMargin(4,4,4,4)
-	sheet.Panel:Dock(FILL)
-
-	sheet = tabs:AddSheet("Settings", vgui.CreateFromTable(include("settings.lua"), tabs))
-	sheet.Panel:DockMargin(4,4,4,4)
-	sheet.Panel:Dock(FILL)
+	for k,v in pairs(menutabs) do
+		local sheet = tabs:AddSheet(v.name, vgui.CreateFromTable(v.panel, tabs))
+		sheet.Panel:DockMargin(4,4,4,4)
+		sheet.Panel:Dock(FILL)
+	end
 
 	for k, v in pairs(tabs.Items) do
 		function v.Tab:Paint(w, h)
@@ -168,18 +165,27 @@ function PK.CreateMenu()
 	return frame
 end
 
-PK.menu = PK.CreateMenu()
+if PK.menu then
+	PK.menu:Close()
+	PK.menu = PK.CreateMenu()
+end
 
 function GM:ScoreboardShow()
+	if not IsValid(PK.menu) then
+		PK.menu = PK.CreateMenu()
+	end
+	gui.EnableScreenClicker(true)
+	RestoreCursorPosition()
 	PK.menu:Show()
 end
 
 function GM:ScoreboardHide()
-	if not isopen then
-		PK.menu:Hide()
-	end
+	RememberCursorPosition()
+	gui.EnableScreenClicker(false)
+	PK.menu:Hide()
 end
 
+/*
 hook.Add("CreateMove", "enablemouseonclick", function()
 	if (input.WasMousePressed(MOUSE_LEFT) or input.WasMousePressed(MOUSE_RIGHT)) and PK.menu:IsVisible() then
 		isopen = true
@@ -187,3 +193,4 @@ hook.Add("CreateMove", "enablemouseonclick", function()
 		gui.EnableScreenClicker(true)
 	end
 end )
+*/

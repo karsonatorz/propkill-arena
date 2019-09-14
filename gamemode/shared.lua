@@ -7,11 +7,10 @@ GM.TeamBased = false
 DeriveGamemode("sandbox")
 
 PK = PK or {
-	debug = true, // enable or disable debug prints
+	debug = true, // enable or disable prints from dprint
 	config = {},
 	arenas = {},
 	gamemodes = {},
-	menu = {},
 	Client = {}
 }
 

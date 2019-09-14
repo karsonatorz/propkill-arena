@@ -89,9 +89,13 @@ function PANEL:Refresh()
 	for k,v in pairs(self.teams:GetChildren()) do
 		v:Remove()
 	end
+	
+	local arena = PK.GetArena(LocalPlayer():GetNWString("arena"))
+	if not IsValid(arena) then return end
+	local teams = arena:GetTeams()
 
-	for k,v in pairs(team.GetAllTeams()) do
-		if #team.GetPlayers(k) == 0 then continue end
+	for k,v in pairs(teams) do
+		if #v:GetPlayers() == 0 then continue end
 
 		local item = self.teams:Add("DPanel")
 		function item:Paint(w, h)
@@ -101,7 +105,7 @@ function PANEL:Refresh()
 		local teamname = vgui.Create("DPanel", item)
 		teamname:Dock(TOP)
 		function teamname:Paint(w, h)
-			draw.SimpleText(v.Name or "", "pk_teamfont", 5, h/2, team.GetColor(k), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+			draw.SimpleText(v:GetName() or "", "pk_teamfont", 5, h/2, v:GetColor(), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 		end
 
 		local players = vgui.Create("DIconLayout", item)
@@ -111,7 +115,7 @@ function PANEL:Refresh()
 		players:SetSpaceY(3)
 		function players:Paint(w, h) end
 
-		for k,v in pairs(team.GetPlayers(k)) do
+		for kk,vv in pairs(v:GetPlayers()) do
 			local prow = players:Add("DPanel")
 			prow:SetHeight(36)
 			function prow:Paint(w, h)
@@ -121,31 +125,31 @@ function PANEL:Refresh()
 			local name = vgui.Create("DPanel", prow)
 			name:Dock(LEFT)
 			function name:Paint(w, h)
-				draw.SimpleText(v:Name() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				draw.SimpleText(vv:Name() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
 			local kills = vgui.Create("DPanel", prow)
 			kills:Dock(LEFT)
 			function kills:Paint(w, h)
-				draw.SimpleText(v:Frags() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				draw.SimpleText(vv:Frags() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
 			local deaths = vgui.Create("DPanel", prow)
 			deaths:Dock(LEFT)
 			function deaths:Paint(w, h)
-				draw.SimpleText(v:Deaths() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				draw.SimpleText(vv:Deaths() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
 			local elo = vgui.Create("DPanel", prow)
 			elo:Dock(LEFT)
 			function elo:Paint(w, h)
-				draw.SimpleText(v:GetNWInt("Elo") or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				draw.SimpleText(vv:GetNWInt("Elo") or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
 			local ping = vgui.Create("DPanel", prow)
 			ping:Dock(LEFT)
 			function ping:Paint(w, h)
-				draw.SimpleText(v:Ping() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				draw.SimpleText(vv:Ping() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
 			function prow:PerformLayout()

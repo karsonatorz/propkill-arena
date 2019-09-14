@@ -25,7 +25,7 @@ function arenameta:NWPlayer(ply, remove)
 	net.Start("PK_ArenaNetPlayer")
 		net.WriteString(tostring(self))
 		net.WriteBool(remove and true or false)
-		net.WriteEntity(ply)
+		net.WriteInt(ply:EntIndex(), 16)
 	net.Broadcast()
 end
 
@@ -36,7 +36,7 @@ function arenameta:NWTeamPlayer(ply, teamName, remove)
 		net.WriteString(tostring(self))
 		net.WriteString(teamName)
 		net.WriteBool(remove and true or false)
-		net.WriteEntity(ply)
+		net.WriteInt(ply:EntIndex(), 16)
 	net.Broadcast()
 end
 
@@ -61,7 +61,7 @@ function arenameta:NWProp(ent, remove)
 	net.Broadcast()
 end
 
-function arenameta:AddNWArena()
+function arenameta:NWArena()
 	net.Start("PK_ArenaNetArena")
 		net.WriteString(tostring(self))
 		net.WriteTable(self:GetInfo())

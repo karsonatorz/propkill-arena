@@ -3,18 +3,6 @@ arenameta.__index = arenameta
 
 PK.arenameta = arenameta
 
-arenameta.team = {}
-arenameta.spawns = {
-	ffa = {
-		{ pos = Vector(6596.689453, -4628.974609, 471.107269), ang = Angle(0, -90, 0) },
-		{ pos = Vector(7318.069824, -14784.813477, 471.107269), ang = Angle(0, 90, 0) },
-	},
-	duel = {
-		{ pos = Vector(6596.689453, -4628.974609, 471.107269), ang = Angle(0, -90, 0) },
-		{ pos = Vector(7318.069824, -14784.813477, 471.107269), ang = Angle(0, 90, 0) },
-	}
-}
-
 include("net.lua")
 include("gamemodes.lua")
 
@@ -187,9 +175,9 @@ function arenameta:GetData()
 	local data = {
 		name = self.name,
 		icon = self.icon,
-		spawns = self.spawns,
+		positions = self.positions,
 		autoload = self.autoload,
-		gamemode = self.gamemode.name or "",
+		gamemode = self.gamemode.abbr or "",
 	}
 	return data
 end

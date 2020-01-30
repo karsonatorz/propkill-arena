@@ -14,9 +14,11 @@ function PANEL:Refresh()
 end
 
 function PANEL:MakeSettings()
+
+
 	self.clientSettings = vgui.Create("Panel", self)
 	self.serverSettings = vgui.Create("Panel", self)
-
+/*
 	PK.GetServerConfig()
 
 	self.settings = {}
@@ -170,8 +172,9 @@ function PANEL:MakeSettings()
 		end
 	end
 	self.serverSettings:Dock(FILL)
-	self:AddSheet("Server", self.serverSettings, "icon16/cog.png")
+	self:AddSheet("Server", self.serverSettings, "icon16/cog.png")*/
 end
+
 
 function PANEL:Paint(w, h)
 	

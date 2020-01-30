@@ -36,7 +36,7 @@ function PANEL:Refresh()
 		local overlay = vgui.Create("DPanel", item.m_Image)
 		overlay:Dock(FILL)
 		function overlay:Paint(w, h)
-			local playercount = tostring(#v.players) .. "/" .. (tostring(v.maxplayers) == "0" and game.MaxPlayers() or "0")
+			local playercount = tostring(table.Count(v.players)) .. "/" .. (tostring(v.maxplayers) == "0" and game.MaxPlayers() or "0")
 			surface.SetFont("pk_arenafont")
 			local width = surface.GetTextSize(playercount)
 

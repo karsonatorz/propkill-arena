@@ -8,11 +8,11 @@ net.Receive("PK_ArenaNetInitialize", function()
 end)
 
 net.Receive("PK_ArenaNetArena", function()
-	local id = net.ReadString()
+	local arena = net.ReadString()
 	local tbl = net.ReadTable()
 	
 	if id == nil or tbl == nil then return end
-	PK.arenas[id] = tbl
+	PK.arenas[arena] = tbl
 end)
 
 net.Receive("PK_ArenaNetVar", function()
@@ -20,7 +20,8 @@ net.Receive("PK_ArenaNetVar", function()
 	local name = net.ReadString()
 	local value = net.ReadType()
 
-	if PK.arenas[arena] == nil then PK.arenas[arena] = {} end
+	if PK.arenas[arena] == nil then return end
+	
 	PK.arenas[arena][name] = value
 end)
 
@@ -37,10 +38,7 @@ net.Receive("PK_ArenaNetPlayer", function()
 	local plyid = net.ReadInt(32)
 	local ply = Entity(plyid)
 
-	if PK.arenas[arena] == nil then
-		PK.arenas[arena] = {}
-		PK.arenas[arena].players = {}
-	end
+	if PK.arenas[arena] == nil then return end
 	
 	if remove then
 		PK.arenas[arena].players[plyid] = nil
@@ -57,11 +55,6 @@ net.Receive("PK_ArenaNetTeamPlayer", function()
 	local ply = Entity(plyid)
 
 	if PK.arenas[arena] == nil then return end
-	if PK.arenas[arena].teams == nil then
-		PK.arenas[arena].teams = {}
-		PK.arenas[arena].teams[team] = {}
-		PK.arenas[arena].teams[team].players = {}
-	end
 	
 	if remove then
 		PK.arenas[arena].teams[team].players[plyid] = nil
@@ -76,11 +69,7 @@ net.Receive("PK_ArenaNetTeamVar", function()
 	local var = net.ReadString()
 	local value = net.ReadType()
 
-	if PK.arenas[arena] == nil then
-		PK.arenas[arena] = {}
-		PK.arenas[arena].teams = {}
-		PK.arenas[arena].teams[team] = {}
-	end
+	if PK.arenas[arena] == nil then return end
 	
 	PK.arenas[arena].teams[team][var] = value
 end)
@@ -90,10 +79,7 @@ net.Receive("PK_ArenaNetProp", function()
 	local remove = net.ReadBool()
 	local ent = net.ReadInt(32)
 
-	if PK.arenas[arena] == nil then
-		PK.arenas[arena] = {}
-		PK.arenas[arena].props = {}
-	end
+	if PK.arenas[arena] == nil then return end
 	
 	if remove then
 		PK.arenas[arena].props[ent] = nil

@@ -19,6 +19,7 @@ include("client/arena/hooks.lua")
 include("client/arena/rounds.lua")
 include("client/arena/teams.lua")
 include("client/arena/gamemodes.lua")
+include("client/arena/editor.lua")
 
 // derma
 include("client/scoreboard/frame.lua")

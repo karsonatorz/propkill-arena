@@ -14,6 +14,7 @@ end
 
 hook.Add("PlayerDeath", "PK_ELO", function(ply, inflictor, attacker)
 	if attacker:IsPlayer() and ply != attacker then
+		local K = 30
 		attNewElo, deadNewElo, diff = CalculateEloRating(attacker:GetNWInt("Elo"), ply:GetNWInt("Elo"), K)
 		PK.API:ChangeInt(attacker, "Elo", diff)
 		PK.API:ChangeInt(ply, "Elo", -diff)
@@ -28,6 +29,7 @@ hook.Add("PlayerDeath", "PK_ELO", function(ply, inflictor, attacker)
 	end
 end)
 
+/*
 //hook.Remove("PlayerDeath", "PK_ELO")
 
 Ra = 1200
@@ -35,3 +37,4 @@ Rb = 1000
 K = 30
 d = 1
 CalculateEloRating(Ra, Rb, K, d)
+*/

@@ -331,7 +331,7 @@ hook.Add("Think", "PK_Bhop", function()
 			RunConsoleCommand("-jump")
 			return
 		end
-		if(LocalPlayer():IsOnGround() or LP:WaterLevel() >0 or LP:GetMoveType() == MOVETYPE_NOCLIP or LP:InVehicle()) then
+		if(LP:GetGroundEntity() != NULL or LP:WaterLevel() >0 or LP:GetMoveType() == MOVETYPE_NOCLIP or LP:InVehicle()) then
 			RunConsoleCommand("+jump")
 		else
 			RunConsoleCommand("-jump")

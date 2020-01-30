@@ -1,5 +1,3 @@
-include("settings.lua")
-
 surface.CreateFont("pk_scoreboardfont", {
 	font = "stb24",
 	size = 32,
@@ -75,7 +73,6 @@ function PK.CreateMenu()
 		//draw.RoundedBox(0, 0, 0, w, h, colors.primary)
 	end
 	function frame.btnClose.DoClick()
-		isopen = false
 		gui.EnableScreenClicker(false)
 		frame:ShowCloseButton(false)
 		frame:Hide()

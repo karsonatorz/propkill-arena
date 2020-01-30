@@ -26,15 +26,18 @@ local base = baseclass.Get('player_sandbox')
 base['FinishMove'] = function() end
 baseclass.Set('player_sandbox', base)
 
--- fix robottard spectator collisions
-hook.Add("ShouldCollide", "ss_noteamcollide", function(ent,ent2)
+hook.Add("ShouldCollide", "ss_noteamcollide", function(ent, ent2)
 	if IsValid(ent) and ent:IsPlayer() and IsValid(ent2) and ent2:IsPlayer() then
+		return false
+	end
+	if IsValid(ent) and ent:GetClass() == "ent_pos" or IsValid(ent2) and ent2:GetClass() == "ent_pos" then
 		return false
 	end
 end)
 
 concommand.Add("arena_table", function()
 	for k,v in pairs(PK.arenas) do
+		print(v)
 		PrintTable({v:GetInfo()})
 	end
 end)

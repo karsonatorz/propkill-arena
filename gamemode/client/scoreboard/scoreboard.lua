@@ -77,6 +77,9 @@ function PANEL:Init()
 	function self.teams:OnSizeChanged(w, h)
 		self:InvalidateChildren(true)
 	end
+
+	//self.arenas = vgui.Create("DPanel", self)
+	//self.arenas:Dock(BOTTOM)
 end
 
 function PANEL:Paint(w, h)
@@ -174,6 +177,14 @@ function PANEL:Refresh()
 		end
 
 	end
+
+	/*if not IsValid(self.arenas) then return end
+
+	for k,v in pairs(self.arenas:GetChildren()) do
+		v:Remove()
+	end*/
+
+
 end
 
 return PANEL

@@ -28,20 +28,19 @@ hook.Add("PlayerSpawnProp", "pk_canspawnprop", function(ply, model)
 end)
 
 function GM:InitPostEntity()
-	physenv.SetPerformanceSettings(
-		{
-			LookAheadTimeObjectsVsObject = 2,
-			LookAheadTimeObjectsVsWorld = 21,
-			MaxAngularVelocity = 3636,
-			MaxCollisionChecksPerTimestep = 5000,
-			MaxCollisionsPerObjectPerTimestep = 48,
-			MaxFrictionMass = 1,
-			MaxVelocity = 2200,
-			MinFrictionMass = 99999,
-		}
-	)
+	physenv.SetPerformanceSettings({
+		LookAheadTimeObjectsVsObject = 2,
+		LookAheadTimeObjectsVsWorld = 21,
+		MaxAngularVelocity = 3636,
+		MaxCollisionChecksPerTimestep = 50,
+		MaxCollisionsPerObjectPerTimestep = 48,
+		MaxFrictionMass = 1,
+		MaxVelocity = 2200,
+		MinFrictionMass = 99999,
+	})
+
 	game.ConsoleCommand("physgun_DampingFactor 1\n")
-	game.ConsoleCommand("physgun_timeToArrive 0.01\n")
+	game.ConsoleCommand("physgun_timeToArrive 0.016\n")
 	game.ConsoleCommand("sv_sticktoground 0\n")
 	game.ConsoleCommand("sv_airaccelerate 2000\n")
 end

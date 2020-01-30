@@ -19,15 +19,16 @@ include("hooks.lua")
 include("rounds.lua")
 include("teams.lua")
 
-function PK.NewGamemode(name)
+function PK.NewGamemode(longname, shortname)
 	local gametemplate = {
-		name = name or "",
+		name = longname or "",
+		abbr = shortname,
 		teams = {},
 		round = {},
 		userHooks = {},
 	}
 	local newgm = setmetatable(gametemplate, gamemeta)
-	PK.gamemodes[name] = newgm
+	PK.gamemodes[shortname] = newgm
 
 	for k,v in pairs(newgm.hooks.playerHooks) do
 		newgm.userHooks[v] = {}

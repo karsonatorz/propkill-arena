@@ -28,7 +28,7 @@ function arenameta:AddPlayer(ply)
 	ply.arena = self
 	ply:SetTeam(TEAM_DEATHMATCH)
 
-	self.players[ply:UserID()] = ply
+	self.players[ply:EntIndex()] = ply
 	self:NWPlayer(ply)
 	self:CallGMHook("PlayerJoinedArena", ply)
 	ply:SetNWString("arena", tostring(self))
@@ -50,7 +50,7 @@ function arenameta:RemovePlayer(ply, silent)
 	end
 
 	ply.arena = nil
-	self.players[ply:UserID()] = nil
+	self.players[ply:EntIndex()] = nil
 
 	self:NWPlayer(ply, true)
 	ply:SetNWString("arena", nil)

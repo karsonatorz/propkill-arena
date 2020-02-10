@@ -78,8 +78,14 @@ function PANEL:Init()
 		self:InvalidateChildren(true)
 	end
 
-	//self.arenas = vgui.Create("DPanel", self)
-	//self.arenas:Dock(BOTTOM)
+	self.arenas = vgui.Create("DHorizontalScroller", self)
+	self.arenas:SetHeight(35)
+	self.arenas:DockMargin(0, 4, 0, 0)
+	self.arenas:Dock(BOTTOM)
+	self.arenas:SetOverlap(-4)
+	function self.arenas:Paint(w, h)
+		draw.RoundedBox(4, 0, 0, w, h, colors.primaryAlt)
+	end
 end
 
 function PANEL:Paint(w, h)
@@ -87,18 +93,38 @@ function PANEL:Paint(w, h)
 end
 
 function PANEL:Refresh()
+	self:RefreshScoreboard()
+	self:RefreshArenas()
+end
+
+function PANEL:RefreshScoreboard()
 	if not IsValid(self.teams) then return end
 
 	for k,v in pairs(self.teams:GetChildren()) do
 		v:Remove()
 	end
 	
-	local arena = PK.GetArena(LocalPlayer():GetNWString("arena"))
-	if not IsValid(arena) then return end
-	local teams = arena:GetTeams()
+	local teams
+	if PK.selectedarena != "global" then
+		local arena = PK.GetArena(PK.selectedarena or LocalPlayer():GetNWString("arena"))
+		if not IsValid(arena) then print("scoreboardrefresh: arena not valid") return end
+		teams = arena:GetTeams()
+	else
+		teams = {{
+			GetPlayers = function()
+				return player.GetAll()
+			end,
+			GetName = function()
+				return "All Players"
+			end,
+			GetColor = function()
+				return Color(255, 255, 255)
+			end
+		}}
+	end
 
 	for k,v in pairs(teams) do
-		if #v:GetPlayers() == 0 then continue end
+		if table.Count(v:GetPlayers()) == 0 then continue end
 
 		local item = self.teams:Add("DPanel")
 		function item:Paint(w, h)
@@ -128,6 +154,7 @@ function PANEL:Refresh()
 			local name = vgui.Create("DPanel", prow)
 			name:Dock(LEFT)
 			function name:Paint(w, h)
+				if not IsValid(vv) then PK.menu:Show() end
 				draw.SimpleText(vv:Name() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
@@ -177,14 +204,42 @@ function PANEL:Refresh()
 		end
 
 	end
+end
 
-	/*if not IsValid(self.arenas) then return end
+function PANEL:RefreshArenas()
+	if not IsValid(self.arenas) then return end
 
-	for k,v in pairs(self.arenas:GetChildren()) do
+	for k,v in pairs(self.arenas.Panels) do
 		v:Remove()
-	end*/
+	end
 
+	for k,v in pairs(table.Merge({global = {name = "Global", players = {1}}}, PK.arenas)) do
+		if table.Count(v.players) < 1 then continue end
 
+		local arenabtn = vgui.Create("DButton", self.arenas)
+		arenabtn:DockMargin(0,0,4,0)
+		arenabtn:Dock(LEFT)
+		arenabtn:SetFont("pk_playerfont")
+		arenabtn:SetText(v.name or "")
+		arenabtn:SetWidth(arenabtn:GetTextSize() + 20)
+		arenabtn:SetTextColor(colors.text)
+		arenabtn.arenaid = k
+		function arenabtn:Paint(w, h)
+			local col = colors.primary
+			if LocalPlayer():GetNWString("arena") == self.arenaid then
+				col = colors.secondary
+			elseif PK.selectedarena == self.arenaid then
+				col = colors.primaryDark
+			end
+			draw.RoundedBox(4, 0, 0, w, h, col)
+		end
+		arenabtn.DoClick = function(this)
+			PK.selectedarena = this.arenaid
+			self:RefreshScoreboard()
+		end
+
+		self.arenas:AddPanel(arenabtn)
+	end
 end
 
 return PANEL

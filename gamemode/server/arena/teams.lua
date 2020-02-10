@@ -6,7 +6,7 @@ PK.teammeta = teammeta
 function teammeta:AddPlayer(arena, ply)
 	if not IsValid(ply) or not ply:IsPlayer() or not IsValid(arena) then return false end
 
-	self.players[ply:UserID()] = ply
+	self.players[ply:EntIndex()] = ply
 	ply.team = self
 
 	arena:NWTeamPlayer(ply, self.name)
@@ -17,7 +17,7 @@ end
 function teammeta:RemovePlayer(arena, ply)
 	if not IsValid(ply) or not ply:IsPlayer() or not IsValid(arena) then return end
 
-	self.players[ply:UserID()] = nil
+	self.players[ply:EntIndex()] = nil
 	ply.team = nil
 
 	arena:NWTeamPlayer(ply, self.name, true)

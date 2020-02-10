@@ -30,10 +30,16 @@ surface.CreateFont("pk_playerfont", {
 
 surface.CreateFont("pk_arenafont", {
 	font = "Arial",
-	size = 18,
+	size = 22,
 	weight = 650,
 	antialias = true,
-	shadow = true,
+})
+
+surface.CreateFont("pk_arenasubfont", {
+	font = "Arial",
+	size = 17,
+	weight = 950,
+	antialias = true,
 })
 
 local isopen = false
@@ -50,7 +56,7 @@ colors = {
 	primary = Color(48, 48, 47),
 	primaryAlt = Color(62, 62, 61),
 	primaryDark = Color(42, 42, 41),
-	secondary = Color(33, 91, 183),
+	secondary = Color(33, 101, 230),
 	divider = Color(255, 255, 255, 255),
 	accent = Color(0, 108, 232),
 	accept = Color(0, 20, 240),
@@ -63,7 +69,7 @@ colors = {
 function PK.CreateMenu()
 	local frame = vgui.Create("DFrame")
 	frame:SetTitle("")
-	frame:SetSize(ScrW()/1.7, ScrH()/1.6)
+	frame:SetSize(math.max(ScrW()/1.7, 1024), math.max(ScrH()/1.6, 576))
 	frame:SetDraggable(true)
 	frame:SetSizable(true)
 	frame:ShowCloseButton(false)
@@ -162,7 +168,7 @@ function PK.CreateMenu()
 	return frame
 end
 
-if PK.menu then
+if PK.menu and IsValid(PK.menu) then
 	PK.menu:Close()
 	PK.menu = PK.CreateMenu()
 end

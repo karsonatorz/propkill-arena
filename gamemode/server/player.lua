@@ -3,9 +3,24 @@ function GM:PlayerInitialSpawn(ply)
 
 	if ply:IsBot() then
 		ply:SetTeam(TEAM_DEATHMATCH)
+		local keys = table.GetKeys(PK.arenas)
+		PK.arenas[keys[math.ceil(math.random(1, #keys))]]:AddPlayer(ply)
 	end
 	ply:Spawn()
 end
+
+concommand.Add("shit", function()
+	local keys = table.GetKeys(PK.arenas)
+	
+	for k,v in pairs(player.GetBots()) do
+		local rand = math.ceil(math.random(1, #keys))
+		local arena = PK.arenas[keys[rand]]
+		if not IsValid(arena) then
+			print(arena)
+		end
+		arena:AddPlayer(v)
+	end
+end)
 
 function GM:PlayerSetModel(ply)
 	local cl_playermodel = ply:GetInfo("cl_playermodel")

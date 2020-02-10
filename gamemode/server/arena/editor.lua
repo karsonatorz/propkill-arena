@@ -93,9 +93,10 @@ function editor:SaveSpawns()
 		for team, v2 in pairs(v) do
 			if newspawns[gamemode][team] == nil then newspawns[gamemode][team] = {} end
 			for k3, spawn in pairs(v2) do
-				if IsValid(spawn.ent) then spawn.ent:Remove() end
-
-				table.insert(newspawns[gamemode][team], {pos = spawn.pos, ang = spawn.ang})
+				if IsValid(spawn.ent) then
+					table.insert(newspawns[gamemode][team], {pos = spawn.ent:GetPos(), ang = spawn.ent:GetAngles()})
+					spawn.ent:Remove()
+				end
 			end
 		end
 	end
@@ -115,9 +116,10 @@ function editor:SaveObjectives()
 	for gamemode, v in pairs(self.positions.objectives) do
 		if newobjectives[gamemode] == nil then newobjectives[gamemode] = {} end
 		for k2, obj in pairs(v) do
-			if IsValid(obj.ent) then obj.ent:Remove() end
-
-			table.insert(newobjectives[gamemode], {pos = obj.pos, ang = obj.ang, data = obj.data})
+			if IsValid(obj.ent) then
+				table.insert(newobjectives[gamemode], {pos = obj.ent:GetPos(), ang = obj.ent.GetAngles(), data = obj.data})
+				obj.ent:Remove()
+			end
 		end
 	end
 
@@ -231,8 +233,8 @@ end)
 
 concommand.Add("pk_editor_editspawns", function(ply, cmd, args)
 	if not ply:IsAdmin() then return end
-	if not IsValid(ply.arena) then print("pk_editor_addspawn: invalid arena") end
-	if not IsValid(ply.arena.editor) then print("pk_editor_addspawn: invalid arena editor") return end
+	if not IsValid(ply.arena) then print("pk_editor_editspawns: invalid arena") end
+	if not IsValid(ply.arena.editor) then print("pk_editor_editspawns: invalid arena editor") return end
 
 	ply.arena.editor:EditSpawns()
 	ply:ChatPrint("editing spawns in " .. ply.arena.name)
@@ -254,6 +256,17 @@ concommand.Add("pk_editor_addobjective", function(ply, cmd, args)
 
 	ply.arena.editor:AddObjective(ply:GetPos(), ply:GetAngles(), {hello = true})
 	ply:ChatPrint("added objective in " .. ply.arena.name)
+end)
+
+concommand.Add("pk_editor_addspawn", function(ply, cmd, args)
+	if not ply:IsAdmin() then return end
+	if not IsValid(ply.arena) then print("pk_editor_addspawn: invalid arena") end
+	if not IsValid(ply.arena.editor) then print("pk_editor_addspawn: invalid arena editor") return end
+
+	local team = args[1] or ply.team.name
+
+	ply.arena.editor:AddSpawn(ply:GetPos(), ply:GetAngles(), team)
+	ply:ChatPrint("added spawn in " .. ply.arena.name .. " for team " .. team)
 end)
 
 concommand.Add("pk_editor_savespawns", function(ply, cmd, args)

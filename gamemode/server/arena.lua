@@ -102,8 +102,7 @@ function PK.LoadArenas(map)
 	end
 end
 
-hook.Add("InitPostEntity", "load autoload arenas", function()
-	//load gamemodes
+function PK.LoadGamemodes()
 	local files, folders = file.Find(GAMEMODE.FolderName .. "/gamemodes/*", "LUA")
 	for k,v in pairs(files) do
 		include(GAMEMODE.FolderName .. "/gamemodes/" .. v)
@@ -111,7 +110,10 @@ hook.Add("InitPostEntity", "load autoload arenas", function()
 	for k,v in pairs(folders) do
 		include(GAMEMODE.FolderName .. "/gamemodes/" .. v .. "/init.lua")
 	end
+end
 
+hook.Add("InitPostEntity", "load autoload arenas", function()
+	PK.LoadGamemodes()
 	PK.LoadArenas()
 end)
 

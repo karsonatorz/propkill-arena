@@ -10,6 +10,16 @@ util.AddNetworkString("PK_ArenaNetTeamPlayer")
 util.AddNetworkString("PK_ArenaNetInitialize")
 util.AddNetworkString("PK_ArenaNetSetupArena")
 
+// Class: Arena
+
+/*
+	Function: Arena:SetNWVar()
+	Sets a variable to be networked to clients
+
+	Parameters:
+		name: string - the name of the variable to be networked
+		value: any - the value to be networked
+*/
 function arenameta:SetNWVar(name, value)
 	if name == nil then return end
 	
@@ -20,6 +30,14 @@ function arenameta:SetNWVar(name, value)
 	net.Broadcast()
 end
 
+/*
+	Function: Arena:NWPlayer()
+	Updates the arena with adding or removing a player
+
+	Parameters:
+		ply: Player - The player to be added or removed
+		remove: bool - true to remove the player from the arena
+*/
 function arenameta:NWPlayer(ply, remove)
 	if ply == nil then return end
 
@@ -30,6 +48,14 @@ function arenameta:NWPlayer(ply, remove)
 	net.Broadcast()
 end
 
+/*
+	Function: Arena:NWTeamPlayer()
+	Updates a team with adding or removing a player
+
+	Parameters:
+		ply: Player - The player to be added or removed
+		remove: bool - Pass true to remove the player from the arena
+*/
 function arenameta:NWTeamPlayer(ply, teamName, remove)
 	if ply == nil or teamName == nil then return end
 
@@ -41,6 +67,15 @@ function arenameta:NWTeamPlayer(ply, teamName, remove)
 	net.Broadcast()
 end
 
+/*
+	Function: Arena:NWTeamVar()
+	Networks a variable relating to a specific team
+
+	Parameters:
+		teamName: string - the name of the team
+		name: string - the name of the variable
+		value: any - the value to send
+*/
 function arenameta:NWTeamVar(teamName, var, value)
 	if teamName == nil or var == nil then return end
 
@@ -52,6 +87,14 @@ function arenameta:NWTeamVar(teamName, var, value)
 	net.Broadcast()
 end
 
+/*
+	Function: Arena:NWProp()
+	Updates the arena with adding or removing a prop
+
+	Parameters:
+		ent: Entity - The entity to be added or removed
+		remove: bool - true to remove the entity from the arena
+*/
 function arenameta:NWProp(ent, remove)
 	if ent == nil then return end
 
@@ -62,6 +105,12 @@ function arenameta:NWProp(ent, remove)
 	net.Broadcast()
 end
 
+/*
+	Function: Arena:NWArena()
+	Sends all the info required for an arena to the client
+
+	Usually only used once when a new arena is created
+*/
 function arenameta:NWArena()
 	net.Start("PK_ArenaNetArena")
 		net.WriteString(tostring(self))

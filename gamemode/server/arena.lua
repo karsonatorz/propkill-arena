@@ -4,6 +4,11 @@ include("arena/editor.lua")
 
 local arenaDir = "pk_arenas"
 
+/*
+	Class: Global
+	Arena global funcs
+*/
+
 local function setupNewArena()
 	local arenatemplate = {
 		name = "Arena" .. #PK.arenas + 1,
@@ -29,6 +34,25 @@ local function setupNewArena()
 	return setmetatable(arenatemplate, PK.arenameta)
 end
 
+/*
+	Function: PK.NewArena()
+	Sets up a new arena
+
+	Parameters:
+		data: table - optional
+
+		* name: string
+		* positions: table
+			* spawns: table
+			* objectives: table
+		* icon: string path
+		* maxplayers: number
+		* gamemode: <Gamemode>
+		* autoload: bool
+	
+	Returns:
+		arena: <Arena>
+*/
 function PK.NewArena(data)
 	local arena = setupNewArena()
 
@@ -71,6 +95,13 @@ local function checkArenaFolders()
 	end
 end
 
+/*
+	Function: PK.SaveArena()
+	Saves the arena data to file
+
+	Parameters:
+		arena: <Arena> - The arena to save
+*/
 function PK.SaveArena(arena)
 	if not IsValid(arena) then return end
 
@@ -80,6 +111,17 @@ function PK.SaveArena(arena)
 	file.Write(arenaDir .. "/" .. cleanFileName(game.GetMap()) .. "/" .. cleanFileName(data.name) .. ".txt", util.TableToJSON(data, true))
 end
 
+/*
+	Function: PK.LoadArena()
+	Loads an arena from file
+
+	Parameters:
+		name: string - The name of the arena to load
+		map: string - optional - The name of the map to load the arena from
+
+	Returns:
+		arena: <Arena> - The newly loaded arena
+*/
 function PK.LoadArena(name, map)
 	if name == nil then return end
 	map = map or game.GetMap()
@@ -90,6 +132,13 @@ function PK.LoadArena(name, map)
 	return arena
 end
 
+/*
+	Function: PK.LoadArenas()
+	Loads all the arenas for the specified or current map
+
+	Parameters:
+		map: string - optional - The name of the map to load the arenas from
+*/
 function PK.LoadArenas(map)
 	map = map or game.GetMap()
 	local files = file.Find(arenaDir .. "/" .. cleanFileName(map) .. "/" .. "*.txt", "DATA")
@@ -100,6 +149,10 @@ function PK.LoadArenas(map)
 	end
 end
 
+/*
+	Function: PK.LoadGamemodes()
+	Loads all the gamemodes ready for use
+*/
 function PK.LoadGamemodes()
 	local files, folders = file.Find(GAMEMODE.FolderName .. "/gamemodes/*", "LUA")
 	for k,v in pairs(files) do

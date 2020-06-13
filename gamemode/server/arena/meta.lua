@@ -5,9 +5,25 @@ PK.arenameta = arenameta
 
 include("net.lua")
 include("gamemodes.lua")
+/*
+	Class: Arena
+	The base arena class
+*/
+
 
 // ==== Arena Player Management ==== \\
 
+/*
+	Function: Arena:AddPlayer()
+	Adds a player to the arena
+
+	Parameters:
+		player: Player - The player to add to the arena
+
+	Returns:
+		success: bool - Did we succeed adding the player to the arena
+		reason: string - The reason if we didn't succeed
+*/
 function arenameta:AddPlayer(ply)
 	if not IsValid(ply) or not ply:IsPlayer() then return false end
 
@@ -37,6 +53,13 @@ function arenameta:AddPlayer(ply)
 	return true
 end
 
+/*
+	Function: Arena:RemovePlayer()
+
+	Parameters:
+		player: Player - The player to remove from the arena
+		silent: bool - Don't call the PlayerLeaveArena hook
+*/
 function arenameta:RemovePlayer(ply, silent)
 	if ply.arena == nil then return end
 
@@ -60,6 +83,17 @@ end
 
 // ==== Arena Hooks ==== \\
 
+/*
+	Function: Arena:CallGMHook()
+	Calls the specified hook in the arena
+
+	Parameters:
+		event: string - The name of the event to call e.g. PlayerJoinedArena
+		vararg - The arguments to be passed to the hooked functions
+
+	Returns:
+		nil unless a hooked function returns a value
+*/
 function arenameta:CallGMHook(event, ...)
 	local gm = self.gamemode
 	if not IsValid(gm) then return false end
@@ -75,6 +109,14 @@ end
 
 // ==== Arena Gamemode ==== \\
 
+/*
+	Function: Arena:SetGamemode()
+	Sets the gamemode of the arena
+
+	Parameters:
+		gamemode: <Gamemode> - The gamemode table the arena will use
+		keepPlayers: bool - Should we keep players in the arena
+*/
 function arenameta:SetGamemode(gm, keepPlayers)
 	if not IsValid(gm) then return end
 
@@ -138,9 +180,14 @@ function arenameta:SetGamemode(gm, keepPlayers)
 
 end
 
+
+/*
+	Function: Arena:GamemodeCleanup()
+	De-initializes the arena and cleans up all data in the arena including gamemode, rounds, teams and props
+*/
 function arenameta:GamemodeCleanup()
 	if IsValid(self.gamemode) then
-		self:CallGMHook("TerminateGame")
+		self:CallGMHook("TerminateGame", self)
 	end
 
 	self:Cleanup()
@@ -164,6 +211,26 @@ end
 
 // ==== Arena Utility ==== \\
 
+/*
+	Function: Arena:GetInfo()
+	Returns a table of arena info. Used internally for networking.
+
+	Returns:
+		data: table
+
+		* name: string
+		* icon: string path
+		* maxplayers: number
+		* players: table
+		* props: table
+		* teams: <Teams>
+		* initialized: bool
+		* round
+			* currentRound: string
+			* subRound: string
+		* gamemode
+			* name: string
+*/
 function arenameta:GetInfo()
 	local data = {
 		name = self.name,
@@ -184,6 +251,19 @@ function arenameta:GetInfo()
 	return data
 end
 
+/*
+	Function: Arena:GetData()
+	Returns a table of arena data. Used internally for saving an arena to file.
+
+	Returns:
+		data: table
+
+		* name: string
+		* icon: string path
+		* positions: number
+		* autoload: bool
+		* gamemode: string - gamemode abbreviation
+*/
 function arenameta:GetData()
 	local data = {
 		name = self.name,
@@ -195,6 +275,10 @@ function arenameta:GetData()
 	return data
 end
 
+/*
+	Function: Arena:Cleanup()
+	Cleans up all the props in an arena
+*/
 function arenameta:Cleanup()
 	for k,v in pairs(self.props) do
 		v:Remove()
@@ -202,10 +286,24 @@ function arenameta:Cleanup()
 	self:SetNWVar("props", self.props)
 end
 
+/*
+	Function: Arena:GetTeam()
+	Gets a team from the arena
+
+	Returns:
+		team: <Team> - Team from arena
+*/
 function arenameta:GetTeam(name)
 	return self.teams[name]
 end
 
+/*
+	Function: Arena:IsValid()
+	Check if the arena is valid
+
+	Returns:
+		valid: bool - True if valid
+*/
 function arenameta:IsValid()
 	return true
 end
@@ -253,3 +351,4 @@ hook.Add("EntityRemoved", "PK_Arena_EntityRemoved", function(ent)
 		arena:NWProp(ent, true)
 	end
 end)
+

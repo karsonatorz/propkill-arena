@@ -2,7 +2,18 @@ local editor = {}
 editor.__index = editor
 
 PK.editor = editor
+// Class: Global
 
+/*
+	Function: PK.EditArena()
+	*Server* Loads the editor for the arena
+
+	Parameters:
+		arenaid: string - The table index of the arena to edit
+	
+	Returns:
+		editor: <Editor> - The editor instance
+*/
 function PK.EditArena(arenaid)
 	local arena = (isstring(arenaid) and PK.arenas[arenaid] or arenaid)
 	if not IsValid(arena) then
@@ -22,6 +33,24 @@ function PK.EditArena(arenaid)
 	return setmetatable(editdata, PK.editor)
 end
 
+/*
+	Class: Editor
+	Used for editing arena data and positions
+*/
+/*
+	Function: Editor:CreatePosEnt()
+	Creates a position entity to be used by gamemodes for spawn/flag/capture point positions
+	Mostly used internally in <Editor:AddSpawn> and <Editor:AddObjective>
+
+	Parameters:
+		pos: Vector - Position of the entity
+		ang: Angle - Angle of the entity
+		color: Color - Color of the entity
+		spawn: bool - Should this position be used as a player spawn
+	
+	Returns:
+		ent: Entity - Entity that was created at the position
+*/
 function editor:CreatePosEnt(pos, ang, color, spawn)
 	if spawn == true then
 		local ent = ents.Create("ent_pos")
@@ -44,6 +73,10 @@ function editor:CreatePosEnt(pos, ang, color, spawn)
 	end
 end
 
+/*
+	Function: Editor:EditSpawns()
+	Spawns all the spawn position entities to be moved/deleted
+*/
 function editor:EditSpawns()
 	if self:IsEditingSpawns() then
 		print("editor.EditSpawns: already editing spawns")
@@ -63,6 +96,10 @@ function editor:EditSpawns()
 
 end
 
+/*
+	Function: Editor:EditObjectives()
+	Spawns all the objective position entities to be moved/deleted
+*/
 function editor:EditObjectives()
 	if self:IsEditingObjectives() then
 		print("editor.EditObjectives: already editing objectives")
@@ -80,6 +117,10 @@ function editor:EditObjectives()
 
 end
 
+/*
+	Function: Editor:SaveSpawns()
+	Saves all the spawn positions to the arena
+*/
 function editor:SaveSpawns()
 	if not self:IsEditingSpawns() then
 		print("editor.SaveSpawns: not editing spawns")
@@ -105,6 +146,10 @@ function editor:SaveSpawns()
 	self.spawneditor = false
 end
 
+/*
+	Function: Editor:SaveObjectives()
+	Saves all the objective positions to the arena
+*/
 function editor:SaveObjectives()
 	if not self:IsEditingObjectives() then
 		print("editor.SaveObjectives: not editing objectives")
@@ -128,6 +173,10 @@ function editor:SaveObjectives()
 	self.objeditor = false
 end
 
+/*
+	Function: Editor:Finish()
+	Removes all the editor from the arena ans saves any data that was modified to file
+*/
 function editor:Finish()
 	if self.arena.editing == false then
 		print("editor.Finish: not editing")
@@ -154,6 +203,15 @@ function editor:Finish()
 	self.arena.editing = false
 end
 
+/*
+	Function: Editor:AddSpawn()
+	Adds a spawn point to the arena
+
+	Parameters:
+		pos: Vector - Position of the spawn point
+		ang: Angle - Angle of the spawn point
+		team: string - Name of the team that can spawn here
+*/
 function editor:AddSpawn(pos, ang, team)
 	if not self:IsEditingSpawns() then
 		print("editor.AddSpawn: not editing")
@@ -175,11 +233,29 @@ function editor:AddSpawn(pos, ang, team)
 	table.insert(self.positions.spawns[gmabbr][team], {pos = pos, ang = ang, ent = ent})
 end
 
+/*
+	Function: Editor:RemoveSpawn()
+	Removes a spawn point to the arena
+
+	*incomplete* - You can remove the spawn point using context menu for now
+
+	Parameters:
+		id - ??
+*/
 function editor:RemoveSpawn(id)
 	if not self:IsEditingSpawns() then return end
 
 end
 
+/*
+	Function: Editor:AddObjective()
+	Adds a spawn point to the arena
+
+	Parameters:
+		pos: Vector - Position of the spawn point
+		ang: Angle - Angle of the spawn point
+		data: table - Data that may be needed in the gamemode such as radius, team or color
+*/
 function editor:AddObjective(pos, ang, data)
 	if not self:IsEditingObjectives() then return end
 
@@ -197,19 +273,49 @@ function editor:AddObjective(pos, ang, data)
 	table.insert(self.positions.objectives[gmabbr], {pos = pos, ang = ang, data = data, ent = ent})
 end
 
+/*
+	Function: Editor:RemoveObjective()
+	Removes a spawn point to the arena
+
+	*incomplete* - You can remove the spawn point using context menu for now
+
+	Parameters:
+		id - ??
+*/
 function editor:RemoveObjective(id)
 	if not self:IsEditingObjectives() then return end
 
 end
 
+/*
+	Function: Editor:IsEditingSpawns()
+	Are we currently editing spawn points?
+	
+	Returns:
+		editing: bool - true if we are editing
+*/
 function editor:IsEditingSpawns()
 	return self.spawneditor or false
 end
 
+/*
+	Function: Editor:IsEditingObjectives()
+	Are we currently editing objective positions?
+	
+	Returns:
+		editing: bool - true if we are editing
+*/
 function editor:IsEditingObjectives()
 	return self.objeditor or false
 end
 
+/*
+	Function: Editor:IsValid()
+	Are we currently editing spawn points?
+	
+	Returns:
+		editing: bool - true if the editor is valid
+*/
 function editor:IsValid()
 	return true
 end

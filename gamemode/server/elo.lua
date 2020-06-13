@@ -16,17 +16,19 @@ hook.Add("PlayerDeath", "PK_ELO", function(ply, inflictor, attacker)
 	if attacker:IsPlayer() and ply != attacker then
 		local K = 30
 		attNewElo, deadNewElo, diff = CalculateEloRating(attacker:GetNWInt("Elo"), ply:GetNWInt("Elo"), K)
-		PK.API:ChangeInt(attacker, "Elo", diff)
-		PK.API:ChangeInt(ply, "Elo", -diff)
+		//PK.API:ChangeInt(attacker, "Elo", diff)
+		//PK.API:ChangeInt(ply, "Elo", -diff)
 
 		attacker:SetNWInt("Elo", attNewElo)
 		ply:SetNWInt("Elo", deadNewElo)
 
-		ply:ChatPrint("-" .. diff .. " ELO")
-		attacker:ChatPrint("+" .. diff .. " ELO")
-		attacker.Elo = attNewElo
-		ply.Elo = deadNewElo
+		//ply:ChatPrint("-" .. diff .. " ELO")
+		//attacker:ChatPrint("+" .. diff .. " ELO")
 	end
+end)
+
+hook.Add("PlayerInitialSpawn", "tempeloset", function(ply)
+	ply:SetNWInt("Elo", 1000)
 end)
 
 /*

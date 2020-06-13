@@ -46,7 +46,7 @@ function GM:InitPostEntity()
 end
 
 hook.Add("CanProperty", "block_remover_property", function(ply, property, ent)
-	return false
+	return ply:IsAdmin()
 end)
 
 hook.Add("PlayerFrozeObject", "PK_Limit_Frozen", function(ply, ent, physobj)

@@ -72,11 +72,6 @@ function GM:PlayerSpawn(ply)
 	ply:SetJumpPower(200)
 end
 
-function GM:OnPlayerChangedTeam(ply, old, new)
-	ChatMsg({team.GetColor(old), ply:Nick(), cwhite, " has joined team ", team.GetColor(new), team.GetName(new), "!"})
-	ply.NextSpawnTime = CurTime()
-end
-
 function GM:DoPlayerDeath(ply, attacker, dmg)
 	ply:CreateRagdoll()
 	ply:AddDeaths(1)
@@ -107,11 +102,11 @@ function GM:PlayerDeath(ply, inflictor, attacker)
 end
 
 function GM:PlayerConnect(name, ip)
-	ChatMsg({Color(120,120,255), name, Color(255,255,255), " is connecting."})
+	ChatMsg({Color(120,120,255), name, Color(255,255,255), " is connecting"})
 end
 
 function GM:PlayerDisconnected(ply)
-	ChatMsg({Color(120,120,255), ply:Nick(), Color(255,255,255), " has disconnected."})
+	ChatMsg({Color(120,120,255), ply:Nick(), Color(255,255,255), " has disconnected"})
 end
 
 hook.Add("PlayerShouldTakeDamage", "PK_PlayerShouldTakeDamage", function(ply, attacker)
@@ -153,7 +148,7 @@ function GM:PlayerDeathSound()
 end
 
 function GM:GetFallDamage()
-	// DISABLES FUCKING ANNOYING CRUNCH FALL SOUND OF HELL
+	// disable fall crunch
 	return 0
 end
 
@@ -236,6 +231,6 @@ hook.Add("KeyPress", "speccontrols", function(ply, key)
 	end
 end)
 
-function GM:ShowTeam(ply) net.Start("pk_teamselect") net.Send(ply) end
+//function GM:ShowTeam(ply) net.Start("pk_teamselect") net.Send(ply) end
 function GM:ShowHelp(ply) net.Start("pk_helpmenu") net.Send(ply) end
 function GM:ShowSpare2(ply) net.Start("pk_settingsmenu") net.Send(ply) end

@@ -8,6 +8,7 @@ util.AddNetworkString("PK_ArenaNetTeamVar")
 util.AddNetworkString("PK_ArenaNetJoinArena")
 util.AddNetworkString("PK_ArenaNetTeamPlayer")
 util.AddNetworkString("PK_ArenaNetInitialize")
+util.AddNetworkString("PK_ArenaNetSetupArena")
 
 function arenameta:SetNWVar(name, value)
 	if name == nil then return end

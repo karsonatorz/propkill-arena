@@ -17,8 +17,7 @@ function arenameta:AddPlayer(ply)
 
 	local canjoin, reason = self:CallGMHook("PlayerJoinArena", ply)
 	if not canjoin then
-		dprint(reason)
-		return false, reason
+		return false, reason or "arena not initialised"
 	end
 
 	if IsValid(ply.arena) then
@@ -114,8 +113,15 @@ function arenameta:SetGamemode(gm, keepPlayers)
 		self.teams[k] = setmetatable(table.Copy(v), PK.teammeta)
 	end
 
+	self.initialized = true
+
 	// tell the gamemode to initialize
-	self:CallGMHook("InitializeGame", v)
+	self:CallGMHook("InitializeGame")
+
+	// network changes
+	self:SetNWVar("gamemode", self:GetInfo().gamemode)
+	self:SetNWVar("teams", self.teams)
+	self:SetNWVar("initialized", self.initialized)
 
 	if keepPlayers then
 		for k,v in pairs(self.players) do
@@ -130,12 +136,11 @@ function arenameta:SetGamemode(gm, keepPlayers)
 		end
 	end
 
-	self:SetNWVar("gamemode", self:GetInfo().gamemode)
 end
 
 function arenameta:GamemodeCleanup()
 	if IsValid(self.gamemode) then
-		self:CallGMHook("TerminateGame", v)
+		self:CallGMHook("TerminateGame")
 	end
 
 	self:Cleanup()
@@ -148,6 +153,13 @@ function arenameta:GamemodeCleanup()
 	self.gmvars = {}
 	self.round = {}
 	self.teams = {}
+	self.initialized = false
+
+	self:SetNWVar("gamemode", self:GetInfo().gamemode)
+	self:SetNWVar("teams", self.teams)
+	self:SetNWVar("initialized", self.initialized)
+
+	self:NWArena()
 end
 
 // ==== Arena Utility ==== \\
@@ -160,6 +172,7 @@ function arenameta:GetInfo()
 		players = self.players,
 		props = self.props,
 		teams = self.teams,
+		initialized = self.initialized,
 		round = {
 			currentRound = self.round.currentRound or "",
 			subRound = self.round.currentSubRound or "",

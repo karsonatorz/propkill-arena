@@ -1,6 +1,6 @@
 -- Remove Skybox
 
-function PK.Client.RemoveSkybox()
+/*function PK.Client.RemoveSkybox()
 	if PK.Client.Config:Get("RemoveSkybox").Value then
 		hook.Add("PostDrawSkyBox", "removeSkybox", function()
 			render.Clear(50, 50, 50, 255)
@@ -196,3 +196,4 @@ for k,v in pairs(PK.Client) do
 		v()
 	end
 end
+*/

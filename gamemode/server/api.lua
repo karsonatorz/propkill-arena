@@ -149,17 +149,24 @@ function PKAPI:AddPropSpawn(ply, model)
 	self:AddModelStat(ply, "PropSpawns", model)
 end
 
-if not PK.API then
-	PK.API = PK.SetupAPI()
+function PKAPI:IsValid()
+	return true
 end
 
-PK.API:GetActivePlayersData()
+if not PK.API then
+	//PK.API = PK.SetupAPI()
+	//PK.API:GetActivePlayersData()
+end
 
 hook.Add("PlayerInitialSpawn", "PK_API_GetPlayerData", function(ply)
+	if not IsValid(PK.API) then return end
+	
 	PK.API:GetPlayerData(ply)
 end)
 
 hook.Add("PlayerDeath", "PK_API_PlayerDeath", function(ply, inflictor, attacker)
+	if not IsValid(PK.API) then return end
+
 	PK.API:AddInt(ply, "Deaths")
 	ply:SetNWInt("TotalDeaths", ply:GetNWInt("TotalDeaths") + 1)
 

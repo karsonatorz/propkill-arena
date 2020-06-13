@@ -23,6 +23,7 @@ local function setupNewArena()
 		gmvars = {},
 		autoload = false,
 		editing = false,
+		initialized = false,
 	}
 
 	return setmetatable(arenatemplate, PK.arenameta)
@@ -38,7 +39,7 @@ function PK.NewArena(data)
 		for k,v in pairs(data) do
 			arena[k] = v
 		end
-		print(gm)
+
 		if IsValid(gm) then
 			arena:SetGamemode(gm)
 		end
@@ -95,10 +96,7 @@ function PK.LoadArenas(map)
 
 	for k,v in pairs(files) do
 		local data = util.JSONToTable(file.Read(arenaDir .. "/" .. cleanFileName(map) .. "/" .. v, "DATA"))
-
-		if data.autoload then
-			PK.NewArena(data)
-		end
+		PK.NewArena(data)
 	end
 end
 

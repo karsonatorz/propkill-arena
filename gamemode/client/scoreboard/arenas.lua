@@ -12,23 +12,48 @@ function PANEL:Init()
 	self.iconlayout:SetSpaceY(10)
 	
 	self.OnSizeChanged = function()
-		self.iconlayout:InvalidateChildren(true)
+		if IsValid(self.iconlayout) then
+			self.iconlayout:InvalidateChildren(true)
+		end
+		if IsValid(self.createmenu) then
+			self.createmenu:InvalidateChildren(true)
+		end
 	end
 	self:Refresh()
 end
 
 function PANEL:ArenaCreator()
-	self.iconlayout:SetVisible(false)
-	local createmenu = vgui.Create("DPanel", self)
+	self.createmenu = vgui.Create("DPanel", self)
+	self.createmenu:DockPadding(5,5,5,5)
+	self.createmenu:SetSize(self:GetSize())
+	function self.createmenu:Paint(w, h)
+	end
 
-	local back = vgui.Create("DButton", createmenu)
+	local bottom = vgui.Create("DPanel", self.createmenu)
+	bottom:Dock(BOTTOM)
+	function bottom:Paint()
+	end
+
+	local back = vgui.Create("DButton", bottom)
+	back:SetText("")
+	back:SetSize(50,25)
+	function back:Paint(w, h)
+		draw.RoundedBox(4, 0, 0, w, h, colors.secondary)
+		draw.SimpleText("back", "pk_arenafont", w/2, h/2, colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+	end
 	back.DoClick = function()
-		createmenu:SetVisible(false)
+		self.createmenu:Remove()
 		self.iconlayout:SetVisible(true)
+	end
+
+	self.createmenu.PerformLayout = function()
+		self.createmenu:SetSize(self:GetSize())
 	end
 end
 
 function PANEL:Refresh()
+	if not IsValid(self.iconlayout) then return end
+
 	for k,v in pairs(self.iconlayout:GetChildren()) do
 		v:Remove()
 	end
@@ -44,6 +69,8 @@ function PANEL:Refresh()
 	end
 
 	for k,v in pairs(PK.arenas) do
+		if not v.initialized then continue end
+		
 		local item = self.iconlayout:Add("DImageButton")
 		item:SetImage(v.icon or "propkill/arena/downtown.png")
 		item.DoClick = function()
@@ -77,6 +104,7 @@ function PANEL:Refresh()
 	create:SetFont("pk_arenafont")
 	create:SetText("Create...")
 	create.DoClick = function()
+		self.iconlayout:SetVisible(false)
 		self:ArenaCreator()
 	end
 

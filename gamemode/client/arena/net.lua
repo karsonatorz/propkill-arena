@@ -55,6 +55,7 @@ net.Receive("PK_ArenaNetTeamPlayer", function()
 	local ply = Entity(plyid)
 
 	if PK.arenas[arena] == nil then return end
+	if not PK.arenas[arena].initialized then return end
 	
 	if remove then
 		PK.arenas[arena].teams[team].players[plyid] = nil

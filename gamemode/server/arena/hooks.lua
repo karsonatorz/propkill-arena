@@ -36,7 +36,7 @@ function gamemeta.hooks.customHooks.PlayerJoinArena(arena, arenaGame, ply)
 		end
 	end
 
-	return true, ""
+	return true, "no reason given"
 end
 
 function gamemeta.hooks.customHooks.PlayerJoinedArena(arena, ply)

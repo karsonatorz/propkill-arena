@@ -3,13 +3,22 @@ gamemeta.__index = gamemeta
 
 PK.gamemeta = gamemeta
 
+// Class: GModHooks
+// These hooks just have the arena prepended onto their parameters
+
 gamemeta.hooks = {
 	playerHooks = {
+		// Function: PlayerSpawn
 		"PlayerSpawn",
+		// Function: PlayerSpawnProp
 		"PlayerSpawnProp",
+		// Function: PlayerSpawnedProp
 		"PlayerSpawnedProp",
+		// Function: DoPlayerDeath
 		"DoPlayerDeath",
+		// Function: PlayerDeath
 		"PlayerDeath",
+		// Function: PlayerSay
 		"PlayerSay"
 	},
 	customHooks = {}
@@ -23,24 +32,31 @@ include("teams.lua")
 
 /*
 	Function: PK.NewGamemode()
+	Creates a new gamemode
 
 	Parameters:
-		name: string - The name of the gamemode e.g. Team Deathmatch
-		abbr: string - Name abbreviation e.g. TDM - this is what the gamemode will be identified and accessed via
+		data: table - A table containing the following:
+
+		* name: string  The name of the gamemode e.g. Team Deathmatch
+		* abbr: string  Name abbreviation e.g. TDM - This is what the gamemode will be identified and accessed via
+		* spawnset: string  The spawnset used when you call <Gamemode:SpawnPlayer()> - Default: ffa
+		* adminonly: bool  Only allow admins to create arenas with this gamemode - Default: false
 
 	Returns:
 		gamemode: <Gamemode>
 */
-function PK.NewGamemode(longname, shortname)
+function PK.NewGamemode(data)
 	local gametemplate = {
-		name = longname or "",
-		abbr = shortname,
+		name = data.name or "",
+		abbr = data.abbr or "",
+		spawnset = data.spawnset or "ffa",
+		adminonly = data.adminonly or false,
 		teams = {},
 		round = {},
 		userHooks = {},
 	}
 	local newgm = setmetatable(gametemplate, gamemeta)
-	PK.gamemodes[shortname] = newgm
+	PK.gamemodes[gametemplate.abbr] = newgm
 
 	for k,v in pairs(newgm.hooks.playerHooks) do
 		newgm.userHooks[v] = {}
@@ -77,6 +93,23 @@ function gamemeta:CreateTeam(name, color)
 	self.teams[name] = teamtemplate
 
 	return self.teams[name]
+end
+
+
+/*
+	Function: Gamemode:SpawnPlayer()
+	Spawn manager function. Call this in a PlayerSpawn hook in your gamemode
+
+	Parameters:
+		ply: Player - The player to spawn
+		arena: <Arena> - The arena to spawn the player in
+*/
+function gamemeta:SpawnPlayer(ply, arena)
+	local teamname = ply.team.name
+	local spawn = math.random(1, #arena.positions.spawns[self.spawnset][teamname])
+
+	ply:SetPos(arena.positions.spawns[self.spawnset][teamname][spawn].pos)
+	ply:SetEyeAngles(arena.positions.spawns[self.spawnset][teamname][spawn].ang)
 end
 
 /*

@@ -81,7 +81,7 @@ end
 
 /*
 	Function: PlayerLeaveArena
-	Called when a player leaves the arena
+	Called after the player is removed from the arena
 
 	Parameters:
 		arena: <Arena> - The arena that was left

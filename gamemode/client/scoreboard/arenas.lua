@@ -24,26 +24,76 @@ end
 
 function PANEL:ArenaCreator()
 	self.createmenu = vgui.Create("DPanel", self)
-	self.createmenu:DockPadding(5,5,5,5)
 	self.createmenu:SetSize(self:GetSize())
 	function self.createmenu:Paint(w, h)
 	end
 
+	local row1 = vgui.Create("DPanel", self.createmenu)
+	row1:DockMargin(0,0,0,3)
+	row1:Dock(TOP)
+	function row1:Paint()
+	end
+
+	local arena = vgui.Create("DComboBox", row1)
+	arena:SetWidth(200)
+	arena:Dock(LEFT)
+	arena:SetValue("Map")
+	for k,v in pairs(PK.arenas) do
+		if v.initialized then continue end
+		arena:AddChoice(v.name or "unnamed arena", k)
+	end
+
+	local row2 = vgui.Create("DPanel", self.createmenu)
+	row2:Dock(TOP)
+	function row2:Paint()
+	end
+
+	local gmselect = vgui.Create("DComboBox", row2)
+	gmselect:SetWidth(200)
+	gmselect:Dock(LEFT)
+	gmselect:SetValue("Gamemode")
+	for k,v in pairs(PK.gamemodes) do
+		if v.initialized then continue end
+		if v.adminonly and not LocalPlayer():IsAdmin() then continue end
+		gmselect:AddChoice(v.name or "unnamed gamemode", v.abbr)
+	end
+
 	local bottom = vgui.Create("DPanel", self.createmenu)
+	bottom:SetHeight(35)
 	bottom:Dock(BOTTOM)
 	function bottom:Paint()
 	end
 
 	local back = vgui.Create("DButton", bottom)
-	back:SetText("")
-	back:SetSize(50,25)
+	back:DockMargin(0,0,4,0)
+	back:SetFont("pk_playerfont")
+	back:SetText("Back")
+	back:SetWidth(back:GetTextSize() + 20)
+	back:Dock(LEFT)
+	back:SetTextColor(colors.text)
 	function back:Paint(w, h)
-		draw.RoundedBox(4, 0, 0, w, h, colors.secondary)
-		draw.SimpleText("back", "pk_arenafont", w/2, h/2, colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		local col = colors.secondary
+		draw.RoundedBox(4, 0, 0, w, h, col)
 	end
 	back.DoClick = function()
 		self.createmenu:Remove()
 		self.iconlayout:SetVisible(true)
+	end
+
+	local create = vgui.Create("DButton", bottom)
+	create:SetFont("pk_playerfont")
+	create:SetText("Create")
+	create:SetWidth(create:GetTextSize() + 20)
+	create:Dock(LEFT)
+	create:SetTextColor(colors.text)
+	function create:Paint(w, h)
+		local col = colors.secondary
+		draw.RoundedBox(4, 0, 0, w, h, col)
+	end
+	create.DoClick = function()
+		local _, map = arena:GetSelected()
+		local _, gm = gmselect:GetSelected()
+		PK.arenas[map]:RequestArena(gm)
 	end
 
 	self.createmenu.PerformLayout = function()

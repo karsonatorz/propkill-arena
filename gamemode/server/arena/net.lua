@@ -8,7 +8,7 @@ util.AddNetworkString("PK_ArenaNetTeamVar")
 util.AddNetworkString("PK_ArenaNetJoinArena")
 util.AddNetworkString("PK_ArenaNetTeamPlayer")
 util.AddNetworkString("PK_ArenaNetInitialize")
-util.AddNetworkString("PK_ArenaNetSetupArena")
+util.AddNetworkString("PK_ArenaNetRequestArena")
 
 // Class: Arena
 
@@ -122,11 +122,23 @@ net.Receive("PK_ArenaNetInitialize", function(len, ply)
 	if ply.arenaInit then return end
 
 	ply.arenaInit = true
-	local tosend = {}
+	local tosend = {
+		arenas = {},
+		gamemodes = {}
+	}
 
 	for k,v in pairs(PK.arenas) do
 		if not IsValid(v) then continue end
-		tosend[tostring(v)] = v:GetInfo()
+		tosend.arenas[tostring(v)] = v:GetInfo()
+	end
+
+	for k,v in pairs(PK.gamemodes) do
+		if not IsValid(v) then continue end
+		tosend.gamemodes[v.abbr] = {
+			name = v.name,
+			abbr = v.abbr,
+			adminonly = v.adminonly
+		}
 	end
 
 	net.Start("PK_ArenaNetInitialize")
@@ -150,4 +162,31 @@ net.Receive("PK_ArenaNetJoinArena", function(len, ply)
 		net.WriteString(not canjoin and reason or "")
 	net.Send(ply)
 
+end)
+
+net.Receive("PK_ArenaNetRequestArena", function(len, ply)
+	local arena = PK.arenas[net.ReadString()]
+	local gm = PK.gamemodes[net.ReadString()]
+	local createcooldown = 120
+
+	//move all this into an arena function at some point
+	if ply.LastCreated and ply.LastCreated > CurTime() then
+		ply:ChatPrint("please wait another " .. math.ceil(ply.LastCreated - CurTime()) .. " seconds before creating another arena")
+		return
+	elseif not IsValid(arena) then
+		ply:ChatPrint("invalid map")
+		return
+	elseif not IsValid(gm) then
+		ply:ChatPrint("invalid gamemode")
+		return
+	elseif gm.adminonly and not ply:IsAdmin() then
+		ply:ChatPrint(gm.name or "gamemode" .. " can only be used by admins")
+	elseif arena.initialized then
+		ply:ChatPrint(arena.name .. " is already in use")
+		return
+	end
+
+	arena:SetGamemode(gm)
+	arena:AddPlayer(ply)
+	ply.LastCreated = CurTime() + createcooldown
 end)

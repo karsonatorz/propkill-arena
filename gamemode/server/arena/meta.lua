@@ -63,16 +63,16 @@ end
 function arenameta:RemovePlayer(ply, silent)
 	if ply.arena == nil then return end
 
-	if not silent then
-		self:CallGMHook("PlayerLeaveArena", ply)
-	end
-
 	if IsValid(ply.team) then
 		ply.team:RemovePlayer(self, ply)
 	end
 
 	ply.arena = nil
 	self.players[ply:EntIndex()] = nil
+
+	if not silent then
+		self:CallGMHook("PlayerLeaveArena", ply)
+	end
 
 	self:NWPlayer(ply, true)
 	ply:SetNWString("arena", nil)
@@ -170,6 +170,7 @@ function arenameta:SetGamemode(gm, keepPlayers)
 			local canjoin, reason = self:CallGMHook("PlayerJoinArena", v)
 			if canjoin then
 				self:CallGMHook("PlayerJoinedArena", v)
+				v:Spawn()
 			end
 		end
 	else
@@ -179,7 +180,6 @@ function arenameta:SetGamemode(gm, keepPlayers)
 	end
 
 end
-
 
 /*
 	Function: Arena:GamemodeCleanup()

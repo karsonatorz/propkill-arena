@@ -4,7 +4,11 @@ hook.Add("InitPostEntity", "PK_ArenaNetClientInit", function()
 end)
 
 net.Receive("PK_ArenaNetInitialize", function()
-	PK.arenas = net.ReadTable()
+	local data = net.ReadTable()
+	for k,v in pairs(data.arenas) do
+		PK.RegisterArena(k, v)
+	end
+	PK.gamemodes  = data.gamemodes
 end)
 
 net.Receive("PK_ArenaNetArena", function()
@@ -12,7 +16,7 @@ net.Receive("PK_ArenaNetArena", function()
 	local tbl = net.ReadTable()
 	
 	if id == nil or tbl == nil then return end
-	PK.arenas[arena] = tbl
+	PK.RegisterArena(arena, tbl)
 end)
 
 net.Receive("PK_ArenaNetVar", function()
@@ -23,13 +27,6 @@ net.Receive("PK_ArenaNetVar", function()
 	if PK.arenas[arena] == nil then return end
 	
 	PK.arenas[arena][name] = value
-end)
-
-net.Receive("PK_ArenaNetNew", function()
-	local arena = net.ReadString()
-	local data = net.ReadTable()
-
-	PK.arenas[arena] = data
 end)
 
 net.Receive("PK_ArenaNetPlayer", function()

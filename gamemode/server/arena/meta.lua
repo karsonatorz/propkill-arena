@@ -58,9 +58,9 @@ end
 
 	Parameters:
 		player: Player - The player to remove from the arena
-		silent: bool - Don't call the PlayerLeaveArena hook
+		return: bool - Return the player back to the default arena
 */
-function arenameta:RemovePlayer(ply, silent)
+function arenameta:RemovePlayer(ply, ret)
 	if ply.arena == nil then return end
 
 	if IsValid(ply.team) then
@@ -69,13 +69,14 @@ function arenameta:RemovePlayer(ply, silent)
 
 	ply.arena = nil
 	self.players[ply:EntIndex()] = nil
-
-	if not silent then
-		self:CallGMHook("PlayerLeaveArena", ply)
+	self:CallGMHook("PlayerLeaveArena", ply)
+	
+	if ret and IsValid(PK.defaultarena) then
+		PK.defaultarena:AddPlayer(ply)
+	else
+		self:NWPlayer(ply, true)
+		ply:SetNWString("arena", nil)
 	end
-
-	self:NWPlayer(ply, true)
-	ply:SetNWString("arena", nil)
 
 	ply:Spawn()
 end
@@ -175,7 +176,7 @@ function arenameta:SetGamemode(gm, keepPlayers)
 		end
 	else
 		for k,v in pairs(self.players) do
-			self:RemovePlayer(v)
+			self:RemovePlayer(v, true)
 		end
 	end
 
@@ -261,6 +262,7 @@ end
 		* name: string
 		* icon: string path
 		* positions: number
+		* default: bool - is this the default arena
 		* gamemode: string - gamemode abbreviation
 */
 function arenameta:GetData()
@@ -268,8 +270,10 @@ function arenameta:GetData()
 		name = self.name,
 		icon = self.icon,
 		positions = self.positions,
+		default = self.default,
 		gamemode = self.gamemode.abbr or "",
 	}
+
 	return data
 end
 

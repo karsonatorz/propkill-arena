@@ -6,7 +6,12 @@ function GM:PlayerInitialSpawn(ply)
 		local keys = table.GetKeys(PK.arenas)
 		PK.arenas[keys[math.ceil(math.random(1, #keys))]]:AddPlayer(ply)
 	end
-	ply:Spawn()
+
+	if IsValid(PK.defaultarena) then
+		PK.defaultarena:AddPlayer(ply)
+	else
+		ply:Spawn()
+	end
 end
 
 concommand.Add("shit", function()

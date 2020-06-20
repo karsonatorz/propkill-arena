@@ -26,6 +26,7 @@ local function setupNewArena()
 		teams = {},
 		gamemode = {},
 		gmvars = {},
+		default = false,
 		editing = false,
 		initialized = false,
 	}
@@ -47,6 +48,7 @@ end
 		* icon: string path
 		* maxplayers: number
 		* gamemode: <Gamemode>
+		* default: bool
 	
 	Returns:
 		arena: <Arena>
@@ -57,6 +59,10 @@ function PK.NewArena(data)
 	if type(data) == "table" then
 		local gm = PK.gamemodes[data.gamemode]
 		data.gamemode = nil
+
+		if data.default then
+			PK.defaultarena = arena
+		end
 
 		for k,v in pairs(data) do
 			arena[k] = v

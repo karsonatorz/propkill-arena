@@ -2,6 +2,7 @@ local ffa = PK.NewGamemode({
 	name = "Free-for-all",
 	abbr = "ffa",
 	spawnset = "ffa",
+	maxplayers = 0
 })
 
 ffa:CreateTeam("Deathmatch", Color(0,255,0))

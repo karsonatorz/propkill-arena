@@ -21,7 +21,7 @@ hook.Add("PlayerSpawnProp", "pk_canspawnprop", function(ply, model)
 		return false
 	end
 
-	if ply:Team() == TEAM_UNASSIGNED then
+	if ply:Team() == TEAM_SPECTATOR then
 		Notify(ply, "You can't spawn props as a Spectator!")
 		return false
 	end

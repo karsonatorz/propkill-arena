@@ -112,7 +112,7 @@ local function ms_prop_screenspace_stuff()
 	if pk_ms_settings_table.PlayerWalls and pk_ms_settings_table.PlayerOpacity then
 		render.SetBlend(pk_ms_settings_table.PlayerOpacity/100)
 		for l,m in pairs(player.GetAll()) do
-			if m:Team() == TEAM_UNASSIGNED then continue end
+			if m:Team() == TEAM_UNASSIGNED or m:Team() == TEAM_SPECTATOR then continue end
 			local tc = team.GetColor(m:Team())
 			render.SetColorModulation(tc["r"]/255,tc["g"]/255,tc["b"]/255)
 			if IsValid(m) and m:Alive() and m:GetMoveType()~=0 then
@@ -174,7 +174,7 @@ concommand.Add("pk_visuals", visualstoggle)
 
 function pk_esp()
 	for k,v in pairs(player.GetAll()) do
-		if v != LocalPlayer() and pk_ms_settings_table.ESP and v:Alive() and v:Team() != TEAM_UNASSIGNED then
+		if v != LocalPlayer() and pk_ms_settings_table.ESP and v:Alive() and v:Team() != TEAM_UNASSIGNED and v:Team() != TEAM_SPECTATOR then
 			local pos1 = v:GetBonePosition(v:LookupBone("ValveBiped.Bip01_Head1") or -1) + Vector(0,0,15)
 			local pos = pos1:ToScreen()
 			draw.SimpleText(v:Nick(), "stb24", pos.x, pos.y, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)

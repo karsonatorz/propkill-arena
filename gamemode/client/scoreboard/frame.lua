@@ -156,10 +156,14 @@ function PK.CreateMenu()
 
 	end
 
-	function frame:Show()
+	function frame:Show(sel)
 		for k,v in pairs(tabs.Items) do
 			if IsValid(v.Panel) and v.Panel.Refresh != nil then
 				v.Panel:Refresh()
+			end
+
+			if isstring(sel) and sel == v.Name then
+				tabs:SetActiveTab(v.Tab)
 			end
 		end
 		self:SetVisible(true)
@@ -173,13 +177,13 @@ if PK.menu and IsValid(PK.menu) then
 	PK.menu = PK.CreateMenu()
 end
 
-function GM:ScoreboardShow()
+function GM:ScoreboardShow(tab)
 	if not IsValid(PK.menu) then
 		PK.menu = PK.CreateMenu()
 	end
 	gui.EnableScreenClicker(true)
 	RestoreCursorPosition()
-	PK.menu:Show()
+	PK.menu:Show(tab or "Scoreboard")
 end
 
 function GM:ScoreboardHide()

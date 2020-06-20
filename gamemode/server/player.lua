@@ -1,13 +1,9 @@
 function GM:PlayerInitialSpawn(ply)
-	ply:SetTeam(TEAM_UNASSIGNED)
-
 	if ply:IsBot() then
 		ply:SetTeam(TEAM_DEATHMATCH)
 		local keys = table.GetKeys(PK.arenas)
 		PK.arenas[keys[math.ceil(math.random(1, #keys))]]:AddPlayer(ply)
-	end
-
-	if IsValid(PK.defaultarena) then
+	elseif IsValid(PK.defaultarena) then
 		PK.defaultarena:AddPlayer(ply)
 	else
 		ply:Spawn()
@@ -37,7 +33,7 @@ function GM:PlayerSetModel(ply)
 	ply:SetPlayerColor(Vector(col))
 end
 
-function PK_PlayerLoadout(ply)
+hook.Add("PlayerLoadout", "PK_PlayerSpawn", function(ply)
 	if ply:Team() != TEAM_UNASSIGNED then
 		ply:SetHealth(1)
 		ply:Give("weapon_physgun")
@@ -45,8 +41,7 @@ function PK_PlayerLoadout(ply)
 
 	local col = ply:GetInfo("cl_weaponcolor")
 	ply:SetWeaponColor(Vector(col))
-end
-hook.Add("PlayerLoadout", "PK_PlayerSpawn", PK_PlayerLoadout)
+end)
 
 
 function GM:PlayerSpawn(ply)
@@ -59,7 +54,7 @@ function GM:PlayerSpawn(ply)
 
 	ply:SetCustomCollisionCheck(true)
 
-	if ply:Team() == TEAM_UNASSIGNED then
+	/*if ply:Team() == TEAM_UNASSIGNED then
 		ply:SetCollisionGroup(COLLISION_GROUP_NONE)
 		ply:SetSolid(SOLID_NONE)
 		ply:StripWeapons()
@@ -69,7 +64,7 @@ function GM:PlayerSpawn(ply)
 		ply:UnSpectate()
 		ply:SetCollisionGroup(COLLISION_GROUP_PLAYER)
 		ply:SetSolid(SOLID_BBOX)
-	end
+	end*/
 
 	ply.streak = 0
 	ply:SetWalkSpeed(400)
@@ -89,11 +84,8 @@ end
 function GM:PlayerDeath(ply, inflictor, attacker)
 	if IsValid(inflictor) and inflictor:GetClass() == "prop_physics" then
 		attacker = inflictor.Owner
-
-		if propOwner != ply then
-			attacker:SendLua("surface.PlaySound(\"/buttons/lightswitch2.wav\")")
-			attacker.streak = attacker.streak + 1
-		end
+		attacker:SendLua("surface.PlaySound(\"/buttons/lightswitch2.wav\")")
+		attacker.streak = attacker.streak + 1
 	end
 
 	ply.streak = 0
@@ -119,18 +111,12 @@ hook.Add("PlayerShouldTakeDamage", "PK_PlayerShouldTakeDamage", function(ply, at
 		return false
 	end
 
-	if attacker:IsPlayer() then
+	if IsValid(attacker) and attacker:IsPlayer() then
 		if attacker:Team() == TEAM_UNASSIGNED then
 			return false
 		end
-
-		if GAMEMODE.TeamBased and attacker:Team() == ply:Team() then
-			return false
-		end
-	else
-		if attacker:GetClass() == "trigger_hurt" then
-			return true
-		end
+	elseif IsValid(attacker) and attacker:GetClass() == "trigger_hurt" then
+		return true
 	end
 end)
 
@@ -157,85 +143,45 @@ function GM:GetFallDamage()
 	return 0
 end
 
-function GetAlivePlayers()
-	local aliveplayers = {}
-	for k,v in pairs( player.GetAll() ) do
-		if v:Alive() and v:Team() != 0 then table.insert( aliveplayers, v ) end
-	end
-	return aliveplayers or nil
-end
+function GetNextPlayer(spectator, spectating)
+	local players = spectator.spectating.players
+	local picknext = false
+	local choice = NULL
 
-function GetNextAlivePlayer( ply )
-	local alive = GetAlivePlayers()
+	for k,v in pairs(players) do
+		if v == spectating then
+			picknext = true
+			continue
+		end
 
-	if #alive < 1 then return nil end
-
-	local prev = nil
-	local choice = nil
-
-	if IsValid( ply ) then
-		for k, p in pairs( alive ) do
-			if prev == ply then
-				choice = p
-			end
-
-			prev = p
+		if picknext then
+			choice = v
+			break
 		end
 	end
 
-	if not IsValid( choice ) then
-		choice = alive[1]
+	if not IsValid(choice) then
+		for k,v in pairs(players) do
+			choice = v
+			break
+		end
 	end
 
 	return choice
 end
 
 hook.Add("KeyPress", "speccontrols", function(ply, key)
-	if ply:GetObserverMode() != 0 then
+	if ply:GetObserverMode() != OBS_MODE_NONE then
 		if key == IN_ATTACK then
-			ply:Spectate( OBS_MODE_ROAMING )
-			ply:SpectateEntity( nil )
-			local alive = GetAlivePlayers()
-			if #alive < 1 then return end
-			local target = table.Random( alive )
-			if IsValid( target ) then
-				ply:SetPos( target:EyePos() )
-			end
-		elseif key == IN_ATTACK2 then
-			local target = GetNextAlivePlayer( ply:GetObserverTarget() )
-			if IsValid( target ) then
-				ply:Spectate(OBS_MODE_CHASE)
-				ply:SpectateEntity( target )
-			end
-		elseif key == IN_DUCK then
-			local pos = ply:GetPos()
-			local ang = ply:EyeAngles()
-			local target = ply:GetObserverTarget()
-			if IsValid( target ) and target:IsPlayer() then
-				pos = target:EyePos()
-				ang = target:EyeAngles()
-			end
-			ply:Spectate( OBS_MODE_ROAMING )
-			ply:SpectateEntity( nil )
-			ply:SetPos( pos )
-			ply:SetEyeAngles( ang )
-			return true
-		elseif key == IN_JUMP then
-			if not ( ply:GetMoveType() == MOVETYPE_NOCLIP ) then
-				ply:SetMoveType( MOVETYPE_NOCLIP )
-			end
-		elseif key == IN_RELOAD then
-			local tgt = ply:GetObserverTarget()
-			if not IsValid( tgt ) or not tgt:IsPlayer() then return end
-			if ply:GetObserverMode() == OBS_MODE_IN_EYE then
-				ply:SetObserverMode(OBS_MODE_CHASE)
-			else
-				ply:SetObserverMode(OBS_MODE_IN_EYE)
+			local target = GetNextPlayer(ply, ply:GetObserverTarget())
+
+			if IsValid(target) then
+				ply:SpectateEntity(target)
 			end
 		end
 	end
 end)
 
-//function GM:ShowTeam(ply) net.Start("pk_teamselect") net.Send(ply) end
+function GM:ShowTeam(ply) net.Start("pk_teamselect") net.Send(ply) end
 function GM:ShowHelp(ply) net.Start("pk_helpmenu") net.Send(ply) end
 function GM:ShowSpare2(ply) net.Start("pk_settingsmenu") net.Send(ply) end

@@ -19,6 +19,7 @@ local function setupNewArena()
 		maxplayers = 0,
 		icon = "propkill/arena/downtown.png",
 		players = {},
+		spectators = {},
 		props = {},
 		hooks = {},
 		timers = {},

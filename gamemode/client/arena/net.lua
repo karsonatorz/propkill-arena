@@ -24,7 +24,7 @@ net.Receive("PK_ArenaNetVar", function()
 	local name = net.ReadString()
 	local value = net.ReadType()
 
-	if PK.arenas[arena] == nil then return end
+	if not IsValid(PK.arenas[arena]) then return end
 	
 	PK.arenas[arena][name] = value
 end)
@@ -35,12 +35,27 @@ net.Receive("PK_ArenaNetPlayer", function()
 	local plyid = net.ReadInt(32)
 	local ply = Entity(plyid)
 
-	if PK.arenas[arena] == nil then return end
+	if not IsValid(PK.arenas[arena]) then return end
 	
 	if remove then
 		PK.arenas[arena].players[plyid] = nil
 	elseif IsValid(ply) then
 		PK.arenas[arena].players[plyid] = ply
+	end
+end)
+
+net.Receive("PK_ArenaNetSpectator", function()
+	local arena = net.ReadString()
+	local remove = net.ReadBool()
+	local plyid = net.ReadInt(32)
+	local ply = Entity(plyid)
+
+	if not IsValid(PK.arenas[arena]) then return end
+	
+	if remove then
+		PK.arenas[arena].spectators[plyid] = nil
+	elseif IsValid(ply) then
+		PK.arenas[arena].spectators[plyid] = ply
 	end
 end)
 
@@ -51,7 +66,7 @@ net.Receive("PK_ArenaNetTeamPlayer", function()
 	local plyid = net.ReadInt(32)
 	local ply = Entity(plyid)
 
-	if PK.arenas[arena] == nil then return end
+	if not IsValid(PK.arenas[arena]) then return end
 	if not PK.arenas[arena].initialized then return end
 	
 	if remove then
@@ -67,7 +82,7 @@ net.Receive("PK_ArenaNetTeamVar", function()
 	local var = net.ReadString()
 	local value = net.ReadType()
 
-	if PK.arenas[arena] == nil then return end
+	if not IsValid(PK.arenas[arena]) then return end
 	
 	PK.arenas[arena].teams[team][var] = value
 end)
@@ -77,7 +92,7 @@ net.Receive("PK_ArenaNetProp", function()
 	local remove = net.ReadBool()
 	local ent = net.ReadInt(32)
 
-	if PK.arenas[arena] == nil then return end
+	if not IsValid(PK.arenas[arena]) then return end
 	
 	if remove then
 		PK.arenas[arena].props[ent] = nil

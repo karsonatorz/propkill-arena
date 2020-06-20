@@ -6,6 +6,7 @@ util.AddNetworkString("PK_ArenaNetArena")
 util.AddNetworkString("PK_ArenaNetPlayer")
 util.AddNetworkString("PK_ArenaNetTeamVar")
 util.AddNetworkString("PK_ArenaNetJoinArena")
+util.AddNetworkString("PK_ArenaNetSpectator")
 util.AddNetworkString("PK_ArenaNetTeamPlayer")
 util.AddNetworkString("PK_ArenaNetInitialize")
 util.AddNetworkString("PK_ArenaNetRequestArena")
@@ -32,7 +33,7 @@ end
 
 /*
 	Function: Arena:NWPlayer()
-	Updates the arena with adding or removing a player
+	Network the player change to clients
 
 	Parameters:
 		ply: Player - The player to be added or removed
@@ -42,6 +43,24 @@ function arenameta:NWPlayer(ply, remove)
 	if ply == nil then return end
 
 	net.Start("PK_ArenaNetPlayer")
+		net.WriteString(tostring(self))
+		net.WriteBool(remove and true or false)
+		net.WriteInt(ply:EntIndex(), 32)
+	net.Broadcast()
+end
+
+/*
+	Function: Arena:NWSpectator()
+	Network the spectator change to clients
+
+	Parameters:
+		ply: Player - The player to be added or removed
+		remove: bool - true to remove the player from the arena
+*/
+function arenameta:NWSpectator(ply, remove)
+	if ply == nil then return end
+
+	net.Start("PK_ArenaNetSpectator")
 		net.WriteString(tostring(self))
 		net.WriteBool(remove and true or false)
 		net.WriteInt(ply:EntIndex(), 32)

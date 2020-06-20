@@ -40,6 +40,10 @@ function arenameta:AddPlayer(ply)
 		ply.arena:RemovePlayer(ply)
 	end
 
+	if IsValid(ply.spectating) then
+		ply.spectating:RemoveSpectator(ply)
+	end
+
 	ply.arena = self
 	ply:SetTeam(TEAM_DEATHMATCH)
 
@@ -63,6 +67,10 @@ end
 function arenameta:RemovePlayer(ply, ret)
 	if ply.arena == nil then return end
 
+	if ply.arena != self then
+		ply:ChatPrint("player is not in this arena")
+	end
+
 	if IsValid(ply.team) then
 		ply.team:RemovePlayer(self, ply)
 	end
@@ -76,9 +84,75 @@ function arenameta:RemovePlayer(ply, ret)
 	else
 		self:NWPlayer(ply, true)
 		ply:SetNWString("arena", nil)
+		ply:Spawn()
+	end
+end
+
+
+/*
+	Funciton: Arena:AddSpectator()
+	Adds the player as a spectator to the arena
+
+	Parameters:
+		ply: Player - The player to spectate the arena
+		target: Player - Optional - The player to spectate
+*/
+function arenameta:AddSpectator(ply, target)
+	if ply.spectating == self then
+		ply:ChatPrint("already spectating that arena")
+		return
 	end
 
-	ply:Spawn()
+	if ply.arena then
+		ply.arena:RemovePlayer(ply)
+	end
+
+	if ply.spectating then
+		ply.spectating:RemoveSpectator(ply)
+	end
+
+	ply:SetTeam(TEAM_SPECTATOR)
+	ply:SetCollisionGroup(COLLISION_GROUP_NONE)
+	ply:SetSolid(SOLID_NONE)
+	ply:StripWeapons()
+	GAMEMODE:PlayerSpawnAsSpectator(ply)
+	ply:Spectate(OBS_MODE_IN_EYE)
+
+	if IsValid(target) and target:IsPlayer() then
+		ply:SpectateEntity(target)
+	end
+
+	ply.spectating = self
+	self.spectators[ply:EntIndex()] = ply
+	self:NWSpectator(ply)
+end
+
+/*
+	Funciton: Arena:RemoveSpectator()
+	Removes from spectating the arena
+
+	Parameters:
+		ply: Player - The player to remove from spectating
+		return: bool - Return the player back to the default arena
+*/
+function arenameta:RemoveSpectator(ply, ret)
+	if ply.spectating == nil then return end
+
+	if ply.spectating != self then
+		ply:ChatPrint("player is not spectating this arena")
+	end
+
+	ply:UnSpectate()
+	ply:SetCollisionGroup(COLLISION_GROUP_PLAYER)
+	ply:SetSolid(SOLID_BBOX)
+
+	ply.spectating = nil
+	self.spectators[ply:EntIndex()] = nil
+	self:NWSpectator(ply, true)
+
+	if ret and IsValid(PK.defaultarena) then
+		PK.defaultarena:AddPlayer(ply)
+	end
 end
 
 
@@ -156,6 +230,7 @@ function arenameta:SetGamemode(gm, keepPlayers)
 		self.teams[k] = setmetatable(table.Copy(v), PK.teammeta)
 	end
 
+	self.maxplayers = gm.maxplayers
 	self.initialized = true
 
 	// tell the gamemode to initialize
@@ -177,6 +252,10 @@ function arenameta:SetGamemode(gm, keepPlayers)
 	else
 		for k,v in pairs(self.players) do
 			self:RemovePlayer(v, true)
+		end
+
+		for k,v in pairs(self.spectators) do
+			self:RemoveSpectator(ply)
 		end
 	end
 
@@ -238,6 +317,7 @@ function arenameta:GetInfo()
 		icon = self.icon,
 		maxplayers = self.maxplayers,
 		players = self.players,
+		spectators = self.spectators,
 		props = self.props,
 		teams = self.teams,
 		initialized = self.initialized,
@@ -319,7 +399,7 @@ hook.Add("PlayerDisconnected", "PK_Arena_PlayerDisconnect", function(ply)
 end)
 
 hook.Add("SetupPlayerVisibility", "PK_Arena_SetupPlayerVisibility", function(ply)
-	local arena = ply.arena
+	local arena = ply.arena or ply.spectating
 
 	if IsValid(arena) then
 		for k,v in pairs(arena.players) do

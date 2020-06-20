@@ -19,7 +19,7 @@ net.Receive("KilledByProp", function()
 	local inflictor = net.ReadString()
 	local attacker  = net.ReadEntity()
 
-	if !attacker:IsPlayer() then
+	if not attacker:IsPlayer() then
 		GAMEMODE:AddDeathNotice(nil, 0, "suicide", ply:Name(), ply:Team())
 		return
 	end

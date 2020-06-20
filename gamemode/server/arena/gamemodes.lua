@@ -41,6 +41,7 @@ include("teams.lua")
 		* abbr: string  Name abbreviation e.g. TDM - This is what the gamemode will be identified and accessed via
 		* spawnset: string  The spawnset used when you call <Gamemode:SpawnPlayer()> - Default: ffa
 		* adminonly: bool  Only allow admins to create arenas with this gamemode - Default: false
+		* maxplayers: number  Maxmimum amount of players allowed in the gamemode, 0 being unlimited - Default: 0
 
 	Returns:
 		gamemode: <Gamemode>
@@ -51,6 +52,7 @@ function PK.NewGamemode(data)
 		abbr = data.abbr or "",
 		spawnset = data.spawnset or "ffa",
 		adminonly = data.adminonly or false,
+		maxplayers = data.maxplayers or 0,
 		teams = {},
 		round = {},
 		userHooks = {},

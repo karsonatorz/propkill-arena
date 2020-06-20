@@ -127,6 +127,14 @@ local function RealTeams()
 end
 
 net.Receive("pk_teamselect", function()
+	if PK.menu:IsVisible() then
+		GAMEMODE.ScoreboardHide(GAMEMODE)
+	else
+		GAMEMODE.ScoreboardShow(GAMEMODE, "Arenas")
+	end
+end)
+
+/*net.Receive("pk_teamselect", function()
 	pk_cancloseteamselect = false
 	hook.Add("Think", "pk_checkf2key", function()
 		if !input.IsKeyDown(KEY_F2) then
@@ -180,7 +188,7 @@ net.Receive("pk_teamselect", function()
 		end
 	end
 	panel:Center()
-end)
+end)*/
 
 /*------------------------------------------
 				Duel Invitation

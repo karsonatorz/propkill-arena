@@ -261,7 +261,6 @@ end
 		* name: string
 		* icon: string path
 		* positions: number
-		* autoload: bool
 		* gamemode: string - gamemode abbreviation
 */
 function arenameta:GetData()
@@ -269,7 +268,6 @@ function arenameta:GetData()
 		name = self.name,
 		icon = self.icon,
 		positions = self.positions,
-		autoload = self.autoload,
 		gamemode = self.gamemode.abbr or "",
 	}
 	return data

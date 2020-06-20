@@ -26,7 +26,6 @@ local function setupNewArena()
 		teams = {},
 		gamemode = {},
 		gmvars = {},
-		autoload = false,
 		editing = false,
 		initialized = false,
 	}
@@ -48,7 +47,6 @@ end
 		* icon: string path
 		* maxplayers: number
 		* gamemode: <Gamemode>
-		* autoload: bool
 	
 	Returns:
 		arena: <Arena>

@@ -16,7 +16,7 @@ ffa:Hook("PlayerJoinedArena", "asdasd", function(arena, ply)
 end)
 
 ffa:Hook("PlayerLeaveArena", "fuck", function(arena, ply)
-	if table.Count(arena.players) == 0 then
+	/*if table.Count(arena.players) == 0 then
 		arena:GamemodeCleanup()
-	end
+	end*/
 end)

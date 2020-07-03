@@ -147,10 +147,13 @@ function GetNextPlayer(spectator, spectating)
 	local players = spectator.spectating.players
 	local picknext = false
 	local choice = NULL
+	local prev = NULL
+	local last = NULL
 
 	for k,v in pairs(players) do
 		if v == spectating then
 			picknext = true
+			prev = last
 			continue
 		end
 
@@ -158,6 +161,8 @@ function GetNextPlayer(spectator, spectating)
 			choice = v
 			break
 		end
+
+		last = v
 	end
 
 	if not IsValid(choice) then
@@ -167,16 +172,26 @@ function GetNextPlayer(spectator, spectating)
 		end
 	end
 
-	return choice
+	if not IsValid(prev) then
+		for k,v in pairs(players) do
+			prev = v
+		end
+	end
+
+	return choice, prev
 end
 
 hook.Add("KeyPress", "speccontrols", function(ply, key)
 	if ply:GetObserverMode() != OBS_MODE_NONE then
-		if key == IN_ATTACK then
-			local target = GetNextPlayer(ply, ply:GetObserverTarget())
+		local next, prev = GetNextPlayer(ply, ply:GetObserverTarget())
 
-			if IsValid(target) then
-				ply:SpectateEntity(target)
+		if key == IN_ATTACK then
+			if IsValid(next) then
+				ply:SpectateEntity(next)
+			end
+		elseif key == IN_ATTACK2 then
+			if IsValid(prev) then
+				ply:SpectateEntity(prev)
 			end
 		end
 	end

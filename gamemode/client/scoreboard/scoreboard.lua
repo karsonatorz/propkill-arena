@@ -13,31 +13,31 @@ function PANEL:Init()
 	local col1 = vgui.Create("DPanel", columns)
 	col1:Dock(LEFT)
 	function col1:Paint(w, h)
-		draw.SimpleText("Name", "pk_bindfont1", 15, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+		draw.SimpleText("Name", "pk_playerrow", 15, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 	end
 
 	local col2 = vgui.Create("DPanel", columns)
 	col2:Dock(LEFT)
 	function col2:Paint(w, h)
-		draw.SimpleText("Kills", "pk_bindfont1", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+		draw.SimpleText("Kills", "pk_playerrow", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 	end
 
 	local col3 = vgui.Create("DPanel", columns)
 	col3:Dock(LEFT)
 	function col3:Paint(w, h)
-		draw.SimpleText("Deaths", "pk_bindfont1", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+		draw.SimpleText("Deaths", "pk_playerrow", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 	end
 
 	local col4 = vgui.Create("DPanel", columns)
 	col4:Dock(LEFT)
 	function col4:Paint(w, h)
-		draw.SimpleText("ELO", "pk_bindfont1", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+		draw.SimpleText("ELO", "pk_playerrow", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 	end
 
 	local col5 = vgui.Create("DPanel", columns)
 	col5:Dock(LEFT)
 	function col5:Paint(w, h)
-		draw.SimpleText("Ping", "pk_bindfont1", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+		draw.SimpleText("Ping", "pk_playerrow", 0, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 	end
 
 	local scroll = vgui.Create("DScrollPanel", self)
@@ -151,32 +151,32 @@ function PANEL:RefreshScoreboard()
 				draw.RoundedBox(4, 0, 0, w, h, colors.primaryDark)
 			end
 
-			local name = vgui.Create("DPanel", prow)
+			local name = vgui.Create("DButton", prow)
 			name:Dock(LEFT)
 			function name:Paint(w, h)
 				if not IsValid(vv) then PK.menu:Show() end
 				draw.SimpleText(vv:Name() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
-			local kills = vgui.Create("DPanel", prow)
+			local kills = vgui.Create("DButton", prow)
 			kills:Dock(LEFT)
 			function kills:Paint(w, h)
 				draw.SimpleText(vv:Frags() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
-			local deaths = vgui.Create("DPanel", prow)
+			local deaths = vgui.Create("DButton", prow)
 			deaths:Dock(LEFT)
 			function deaths:Paint(w, h)
 				draw.SimpleText(vv:Deaths() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
-			local elo = vgui.Create("DPanel", prow)
+			local elo = vgui.Create("DButton", prow)
 			elo:Dock(LEFT)
 			function elo:Paint(w, h)
 				draw.SimpleText(vv:GetNWInt("Elo") or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
-			local ping = vgui.Create("DPanel", prow)
+			local ping = vgui.Create("DButton", prow)
 			ping:Dock(LEFT)
 			function ping:Paint(w, h)
 				draw.SimpleText(vv:Ping() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
@@ -191,6 +191,34 @@ function PANEL:RefreshScoreboard()
 				deaths:SetWidth(colwidth * 0.12)
 				elo:SetWidth(colwidth * 0.12)
 				ping:SetWidth(colwidth * 0.12)
+			end
+
+			for k,v in pairs(prow:GetChildren()) do
+				v:SetText("")
+				v.DoRightClick = function()
+					local right = vgui.Create("DMenu", v)
+					local arena = vv:GetNWString("arena")
+
+					right:AddOption("Profile", function()
+						gui.OpenURL("https://steamcommunity.com/profiles/" .. vv:SteamID64())
+					end)
+					if IsValid(PK.arenas[arena]) and LocalPlayer():GetNWString("arena") != arena then
+						right:AddOption("Join", function()
+							net.Start("PK_ArenaNetJoinArena")
+								net.WriteString(vv:GetNWString("arena"))
+							net.SendToServer()
+						end)
+					end
+					right:AddOption("Spectate", function()
+						net.Start("PK_ArenaNetSpectateArena")
+							net.WriteString(vv:GetNWString("arena"))
+							net.WriteEntity(vv)
+						net.SendToServer()
+					end)
+
+					right:Open()
+				end
+				v.DoClick = v.DoRightClick
 			end
 		end
 

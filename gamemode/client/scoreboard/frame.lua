@@ -14,6 +14,14 @@ surface.CreateFont("pk_scoreboardfont2", {
 	shadow = true,
 })
 
+surface.CreateFont("pk_playerrow", {
+	font = "Arial",
+	extended = false,
+	size = 16,
+	weight = 800,
+	antialias = true,
+})
+
 surface.CreateFont("pk_teamfont", {
 	font = "Arial",
 	size = 20,

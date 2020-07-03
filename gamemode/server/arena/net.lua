@@ -10,6 +10,7 @@ util.AddNetworkString("PK_ArenaNetSpectator")
 util.AddNetworkString("PK_ArenaNetTeamPlayer")
 util.AddNetworkString("PK_ArenaNetInitialize")
 util.AddNetworkString("PK_ArenaNetRequestArena")
+util.AddNetworkString("PK_ArenaNetSpectateArena")
 
 // Class: Arena
 
@@ -169,10 +170,10 @@ net.Receive("PK_ArenaNetJoinArena", function(len, ply)
 	if not IsValid(ply) or not ply:IsPlayer() then return end
 
 	local arenaid = net.ReadString()
-	print("server:", arenaid)
 	local arena = PK.arenas[arenaid]
+	print(ply:Nick(), "attempt join:", arenaid)
 
-	if not IsValid(arena) then dprint(ply:Nick(), "attempted to join invalid arena") return end
+	if not IsValid(arena) then ply:ChatPrint("attempted to join invalid arena") return end
 
 	local canjoin, reason = arena:AddPlayer(ply)
 
@@ -181,6 +182,20 @@ net.Receive("PK_ArenaNetJoinArena", function(len, ply)
 		net.WriteString(not canjoin and reason or "")
 	net.Send(ply)
 
+end)
+
+net.Receive("PK_ArenaNetSpectateArena", function(len, ply)
+	if not IsValid(ply) or not ply:IsPlayer() then return end
+
+	local arenaid = net.ReadString()
+	local spec = net.ReadEntity()
+
+	local arena = PK.arenas[arenaid]
+	print(ply:Nick(), "attempt spectate:", arenaid)
+
+	if not IsValid(arena) then ply:ChatPrint("attempted to spectate invalid arena") return end
+
+	arena:AddSpectator(ply, spec != Entity(0) and spec or nil)
 end)
 
 net.Receive("PK_ArenaNetRequestArena", function(len, ply)

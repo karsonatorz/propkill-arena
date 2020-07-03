@@ -131,6 +131,16 @@ function PANEL:Refresh()
 			PK.selectedarena = nil
 		end
 
+		item.DoRightClick = function()
+			local right = DermaMenu(item)
+			right:AddOption("Spectate", function()
+				net.Start("PK_ArenaNetSpectateArena")
+					net.WriteString(k)
+				net.SendToServer()
+			end)
+			right:Open()
+		end
+
 		local overlay = vgui.Create("DPanel", item.m_Image)
 		overlay:Dock(FILL)
 		function overlay:Paint(w, h)

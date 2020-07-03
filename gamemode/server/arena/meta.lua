@@ -103,6 +103,11 @@ function arenameta:AddSpectator(ply, target)
 		return
 	end
 
+	if table.Count(self.players) == 0 then
+		ply:ChatPrint("no one to spectate")
+		return
+	end
+
 	if ply.arena then
 		ply.arena:RemovePlayer(ply)
 	end
@@ -118,8 +123,13 @@ function arenameta:AddSpectator(ply, target)
 	GAMEMODE:PlayerSpawnAsSpectator(ply)
 	ply:Spectate(OBS_MODE_IN_EYE)
 
-	if IsValid(target) and target:IsPlayer() then
+	if IsValid(target) and IsValid(target.arena) and target.arena.players[target:EntIndex()] == target then
 		ply:SpectateEntity(target)
+	else
+		for k,v in pairs(self.players) do
+			ply:SpectateEntity(v)
+			break
+		end
 	end
 
 	ply.spectating = self

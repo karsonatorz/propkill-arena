@@ -218,7 +218,7 @@ function editor:AddSpawn(pos, ang, team)
 		return
 	end
 
-	local ent = self:CreatePosEnt(pos, ang, team, true)
+	local ent = self:CreatePosEnt(pos, ang, self.arena.gamemode.teams[team].color, true)
 
 	if not IsValid(ent) then
 		print("editor.AddSpawn: entity not valid")
@@ -348,8 +348,8 @@ end)
 
 concommand.Add("pk_editor_editobjectives", function(ply, cmd, args)
 	if not ply:IsAdmin() then return end
-	if not IsValid(ply.arena) then print("pk_editor_addspawn: invalid arena") end
-	if not IsValid(ply.arena.editor) then print("pk_editor_addspawn: invalid arena editor") return end
+	if not IsValid(ply.arena) then print("pk_editor_editobjectives: invalid arena") end
+	if not IsValid(ply.arena.editor) then print("pk_editor_editobjectives: invalid arena editor") return end
 
 	ply.arena.editor:EditObjectives()
 	ply:ChatPrint("editing objective in " .. ply.arena.name)
@@ -357,8 +357,8 @@ end)
 
 concommand.Add("pk_editor_addobjective", function(ply, cmd, args)
 	if not ply:IsAdmin() then return end
-	if not IsValid(ply.arena) then print("pk_editor_addspawn: invalid arena") end
-	if not IsValid(ply.arena.editor) then print("pk_editor_addspawn: invalid arena editor") return end
+	if not IsValid(ply.arena) then print("pk_editor_addobjective: invalid arena") end
+	if not IsValid(ply.arena.editor) then print("pk_editor_addobjective: invalid arena editor") return end
 
 	ply.arena.editor:AddObjective(ply:GetPos(), ply:GetAngles(), {hello = true})
 	ply:ChatPrint("added objective in " .. ply.arena.name)
@@ -377,8 +377,8 @@ end)
 
 concommand.Add("pk_editor_savespawns", function(ply, cmd, args)
 	if not ply:IsAdmin() then return end
-	if not IsValid(ply.arena) then print("pk_editor_addspawn: invalid arena") end
-	if not IsValid(ply.arena.editor) then print("pk_editor_addspawn: invalid arena editor") return end
+	if not IsValid(ply.arena) then print("pk_editor_savespawns: invalid arena") end
+	if not IsValid(ply.arena.editor) then print("pk_editor_savespawns: invalid arena editor") return end
 
 	ply.arena.editor:SaveSpawns()
 	ply:ChatPrint("saved spawns in " .. ply.arena.name)
@@ -386,8 +386,8 @@ end)
 
 concommand.Add("pk_editor_saveobjectives", function(ply, cmd, args)
 	if not ply:IsAdmin() then return end
-	if not IsValid(ply.arena) then print("pk_editor_addspawn: invalid arena") end
-	if not IsValid(ply.arena.editor) then print("pk_editor_addspawn: invalid arena editor") return end
+	if not IsValid(ply.arena) then print("pk_editor_saveobjectives: invalid arena") end
+	if not IsValid(ply.arena.editor) then print("pk_editor_saveobjectives: invalid arena editor") return end
 
 	ply.arena.editor:SaveObjectives()
 	ply:ChatPrint("saved objective in " .. ply.arena.name)
@@ -395,8 +395,8 @@ end)
 
 concommand.Add("pk_editor_finish", function(ply, cmd, args)
 	if not ply:IsAdmin() then return end
-	if not IsValid(ply.arena) then print("pk_editor_addspawn: invalid arena") end
-	if not IsValid(ply.arena.editor) then print("pk_editor_addspawn: invalid arena editor") return end
+	if not IsValid(ply.arena) then print("pk_editor_finish: invalid arena") end
+	if not IsValid(ply.arena.editor) then print("pk_editor_finish: invalid arena editor") return end
 
 	ply.arena.editor:Finish()
 	ply:ChatPrint("finished editing " .. ply.arena.name)

@@ -34,6 +34,7 @@ end
 */
 function PK.RegisterArena(id, tbl)
 	tbl.arenaid = id
+	print(id, tbl, "aaa")
 	PK.arenas[id] = setmetatable(tbl, arenameta)
 	return PK.arenas[id]
 end

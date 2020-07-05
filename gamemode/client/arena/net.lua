@@ -14,8 +14,9 @@ end)
 net.Receive("PK_ArenaNetArena", function()
 	local arena = net.ReadString()
 	local tbl = net.ReadTable()
+
+	if arena == nil or tbl == nil then return end
 	
-	if id == nil or tbl == nil then return end
 	PK.RegisterArena(arena, tbl)
 end)
 

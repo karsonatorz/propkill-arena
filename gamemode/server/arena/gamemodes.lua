@@ -108,6 +108,15 @@ end
 */
 function gamemeta:SpawnPlayer(ply, arena)
 	local teamname = ply.team.name
+
+	if arena.positions.spawns[self.spawnset] == nil then
+		ply:ChatPrint("no spawns for this arena")
+		return
+	elseif arena.positions.spawns[self.spawnset][teamname] == nil then
+		ply:ChatPrint("no spawns for this team")
+		return
+	end
+
 	local spawn = math.random(1, #arena.positions.spawns[self.spawnset][teamname])
 
 	ply:SetPos(arena.positions.spawns[self.spawnset][teamname][spawn].pos)

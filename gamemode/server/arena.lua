@@ -173,3 +173,10 @@ hook.Add("InitPostEntity", "load autoload arenas", function()
 	PK.LoadArenas()
 end)
 
+// for development
+for k,v in pairs(PK.arenas) do
+	setmetatable(v, PK.arenameta)
+	if v.initialized then
+		v:SetGamemode(PK.gamemodes[v.gamemode.abbr], true)
+	end
+end

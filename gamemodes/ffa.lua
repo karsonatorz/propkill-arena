@@ -16,7 +16,12 @@ ffa:Hook("PlayerJoinedArena", "asdasd", function(arena, ply)
 	team1:AddPlayer(arena, ply)
 end)
 
+ffa:Hook("PlayerDeath", "cleanup on death", function(arena, ply)
+	arena:Cleanup(ply)
+end)
+
 ffa:Hook("PlayerLeaveArena", "fuck", function(arena, ply)
+	arena:Cleanup(ply)
 	/*if table.Count(arena.players) == 0 then
 		arena:GamemodeCleanup()
 	end*/

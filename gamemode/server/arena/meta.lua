@@ -369,12 +369,24 @@ end
 
 /*
 	Function: Arena:Cleanup()
-	Cleans up all the props in an arena
+	Cleanup a players props or all props in the arena if no player is specified
+
+	Parameters:
+		ply: Player - Optional - The players props to cleanup
 */
-function arenameta:Cleanup()
-	for k,v in pairs(self.props) do
-		v:Remove()
+function arenameta:Cleanup(ply)
+	if IsValid(ply) and ply:IsPlayer() then
+		for k,v in pairs(self.props) do
+			if v.Owner == ply then
+				v:Remove()
+			end
+		end
+	elseif ply == nil then
+		for k,v in pairs(self.props) do
+			v:Remove()
+		end
 	end
+
 	self:SetNWVar("props", self.props)
 end
 

@@ -72,7 +72,7 @@ function arenameta:RemovePlayer(ply, ret)
 	end
 
 	if IsValid(ply.team) then
-		ply.team:RemovePlayer(self, ply)
+		ply.team:RemovePlayer(ply)
 	end
 
 	ply.arena = nil
@@ -183,12 +183,12 @@ function arenameta:CallGMHook(event, ...)
 	local gm = self.gamemode
 	if not IsValid(gm) then return false end
 
-	if gm.hooks.customHooks[event] == nil then
+	if PK.gamemeta.hooks.customHooks[event] == nil then
 		error("Attempt to call non-existent gamemode hook", 2)
 		return
 	end
 
-	return gm.hooks.customHooks[event](self, ...)
+	return PK.gamemeta.hooks.customHooks[event](self, ...)
 end
 
 
@@ -202,17 +202,19 @@ end
 		gamemode: <Gamemode> - The gamemode table the arena will use
 		keepPlayers: bool - Should we keep players in the arena
 */
+local a = 0
 function arenameta:SetGamemode(gm, keepPlayers)
 	if not IsValid(gm) then return end
 
 	// cleanup anything left from the previous gamemode
 	self:GamemodeCleanup()
-	self.gamemode = gm
+	self.gamemode = setmetatable(table.Copy(gm), PK.gamemeta)
+	self.gamemode.arena = self
 
 	// initialize all the users hooks from the gamemode
 	for k,v in pairs(gm.userHooks) do
 		// check that it isnt an arena hook
-		if gm.hooks.customHooks[k] == nil then
+		if PK.gamemeta.hooks.customHooks[k] == nil then
 			self.hooks[k] = tostring(self)
 
 			hook.Add(k, tostring(self), function(ply, ...)
@@ -220,7 +222,7 @@ function arenameta:SetGamemode(gm, keepPlayers)
 				if ply.arena != self then return end
 
 				for kk, vv in pairs(v) do
-					local ret = vv(self, ply, ...)
+					local ret = vv(self.gamemode, ply, ...)
 					
 					if type(ret) != "nil" then
 						return ret
@@ -232,24 +234,26 @@ function arenameta:SetGamemode(gm, keepPlayers)
 
 	// setup rounds
 	for k,v in pairs(gm.round) do
-		self.round[k] = v
+		self.gamemode.round[k] = v
 	end
 
 	// setup teams
 	for k,v in pairs(gm.teams) do
-		self.teams[k] = setmetatable(table.Copy(v), PK.teammeta)
+		self.gamemode.teams[k] = setmetatable(table.Copy(v), PK.teammeta)
+		self.gamemode.teams[k].arena = self
 	end
 
 	self.maxplayers = gm.maxplayers
 	self.initialized = true
 
 	// tell the gamemode to initialize
-	self:CallGMHook("InitializeGame")
+	self:CallGMHook("InitializeGamemode", self)
 
 	// network changes
-	self:SetNWVar("gamemode", self:GetInfo().gamemode)
-	self:SetNWVar("teams", self.teams)
-	self:SetNWVar("initialized", self.initialized)
+	local arenainfo = self:GetInfo()
+	self:SetNWVar("gamemode", arenainfo.gamemode)
+	self:SetNWVar("teams", arenainfo.teams)
+	self:SetNWVar("initialized", arenainfo.initialized)
 
 	if keepPlayers then
 		for k,v in pairs(self.players) do
@@ -322,6 +326,12 @@ end
 			* name: string
 */
 function arenameta:GetInfo()
+	local teams = {}
+
+	for k,v in pairs(self.gamemode.teams or {}) do
+		teams[k] = v:GetInfo()
+	end
+
 	local data = {
 		name = self.name,
 		icon = self.icon,
@@ -329,7 +339,7 @@ function arenameta:GetInfo()
 		players = self.players,
 		spectators = self.spectators,
 		props = self.props,
-		teams = self.teams,
+		teams = teams,
 		initialized = self.initialized,
 		round = {
 			currentRound = self.round.currentRound or "",
@@ -388,17 +398,6 @@ function arenameta:Cleanup(ply)
 	end
 
 	self:SetNWVar("props", self.props)
-end
-
-/*
-	Function: Arena:GetTeam()
-	Gets a team from the arena
-
-	Returns:
-		team: <Team> - Team from arena
-*/
-function arenameta:GetTeam(name)
-	return self.teams[name]
 end
 
 /*

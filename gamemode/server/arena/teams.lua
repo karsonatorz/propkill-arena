@@ -15,19 +15,22 @@ PK.teammeta = teammeta
 	Adds a player to the team
 
 	Parameters:
-		arena: <Arena> - the arena that the player is in
 		ply: Player - the player to add to the team
 
 	Returns:
 		success: bool - true if adding the player succeeded
 */
-function teammeta:AddPlayer(arena, ply)
-	if not IsValid(ply) or not ply:IsPlayer() or not IsValid(arena) then return false end
+function teammeta:AddPlayer(ply)
+	if not IsValid(ply) or not ply:IsPlayer() or not IsValid(self.arena) then return false end
+
+	if IsValid(ply.team) then
+		ply.team:RemovePlayer(ply)
+	end
 
 	self.players[ply:EntIndex()] = ply
 	ply.team = self
 
-	arena:NWTeamPlayer(ply, self.name)
+	self.arena:NWTeamPlayer(ply, self.name)
 
 	return true
 end
@@ -37,37 +40,44 @@ end
 	Removes a player from the team
 
 	Parameters:
-		arena: <Arena> - the arena that the player is in
 		ply: Player - the player to remove from the team
 */
-function teammeta:RemovePlayer(arena, ply)
-	if not IsValid(ply) or not ply:IsPlayer() or not IsValid(arena) then return end
+function teammeta:RemovePlayer(ply)
+	if not IsValid(ply) or not ply:IsPlayer() or not IsValid(self.arena) then return end
 
 	self.players[ply:EntIndex()] = nil
 	ply.team = nil
 
-	arena:NWTeamPlayer(ply, self.name, true)
+	self.arena:NWTeamPlayer(ply, self.name, true)
+end
+
+function teammeta:GetInfo()
+	return {
+		points = self.points,
+		players = self.players,
+		name = self.name,
+		color = self.color,
+	}
 end
 
 /*
 	Function: Team:AddPoints()
-	Removes a player from the team
+	Adds a point to the team
 
 	Parameters:
-		arena: <Arena> - The arena that the team is in
 		amount: number - The amount of points to add to the teams score
 */
-function teammeta:AddPoints(arena, amount)
-	if not IsValid(arena) then return end
+function teammeta:AddPoints(amount)
+	if not IsValid(self.arena) then return end
 
 	self.points = self.points + (amount or 1)
 
-	arena:NWTeamVar(self.name, "points", self.points)
+	self.arena:NWTeamVar(self.name, "points", self.points)
 end
 
 /*
-	Function: Team:AddPoints()
-	Removes a player from the team
+	Function: Team:GetPoints()
+	Gets the teams points
 
 	Returns:
 		points: number - The amount of points the team has

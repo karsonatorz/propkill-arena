@@ -78,17 +78,33 @@ util.AddNetworkString("pk_matchhistory")
 util.AddNetworkString("PK_Config_Get")
 util.AddNetworkString("PK_Config_Set")
 
+function reloadarenas()
+	PK.LoadGamemodes()
+	for k,v in pairs(PK.arenas) do
+		setmetatable(v, PK.arenameta)
+		if v.initialized then
+			v:SetGamemode(PK.gamemodes[v.gamemode.abbr], true)
+		end
+	end
+end
+
 function GM:Initialize()
 	LogPrint("Initializing...")
+	reloadarenas()
 end
 
 -- Show notification when lua is updated live
 if pk_gminitialized and !timer.Exists("PK_UpdateAntiSpam") then
 	ChatMsg({Color(0,200,0), "[PK:A]: ", Color(200,200,200), "Gamemode was updated!"})
 	timer.Create("PK_UpdateAntiSpam", 4, 1, function() end) -- stop spam as each server file is live updated
-	PK.LoadGamemodes()
 end
+
+if pk_gminitialized then
+	reloadarenas()
+end
+
 pk_gminitialized = true
 
+// for development
 
 

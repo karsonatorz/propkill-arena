@@ -8,6 +8,7 @@ function GM:PlayerInitialSpawn(ply)
 	else
 		ply:Spawn()
 	end
+	ply:AllowFlashlight(true)
 end
 
 concommand.Add("shit", function()
@@ -45,6 +46,7 @@ end)
 
 
 function GM:PlayerSpawn(ply)
+	if ply:Team() == TEAM_SPECTATOR then return end
 	player_manager.OnPlayerSpawn(ply)
 	player_manager.RunClass(ply, "Spawn")
 
@@ -89,7 +91,8 @@ function GM:PlayerDeath(ply, inflictor, attacker)
 	end
 
 	ply.streak = 0
-	ply.NextSpawnTime = CurTime() + 2
+	ply.NextSpawnTime = ply.NextArenaSpawnTime or CurTime() + 2
+	ply.NextArenaSpawnTime = nil
 
 	net.Start("KilledByProp")
 		net.WriteEntity(ply)
@@ -143,12 +146,28 @@ function GM:GetFallDamage()
 	return 0
 end
 
+local function GetValidPlayers(tbl)
+	local ret = {}
+	
+	for k,v in pairs(tbl) do
+		if v:Alive() and v:Team() != TEAM_SPECTATOR then
+			table.insert(ret, v)
+		end
+	end
+
+	return ret
+end
+
 function GetNextPlayer(spectator, spectating)
-	local players = spectator.spectating.players
+	local players = GetValidPlayers(spectator.spectating.players)
 	local picknext = false
 	local choice = NULL
 	local prev = NULL
 	local last = NULL
+
+	if table.Count(players) == 0 then
+		return NULL, NULL
+	end
 
 	for k,v in pairs(players) do
 		if v == spectating then

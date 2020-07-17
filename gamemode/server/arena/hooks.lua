@@ -53,9 +53,9 @@ end
 		canjoin: bool - Return false if you don't want to allow the player to join
 		reason: string - The reason that will be shown to the user why they can't join
 */
-function gamemeta.hooks.customHooks.PlayerJoinArena(arena, ply)
-	for k,v in pairs(arena.gamemode.userHooks.PlayerJoinArena) do
-		local ret, reason = v(arena, ply)
+function gamemeta.hooks.customHooks.PlayerJoinArena(self, ply)
+	for k,v in pairs(self.gamemode.userHooks.PlayerJoinArena) do
+		local ret, reason = v(self.gamemode, ply)
 
 		if ret != nil then
 			return ret, reason
@@ -73,9 +73,9 @@ end
 		arena: <Arena> - The arena that was joined
 		ply: Player - The player that joined the arena
 */
-function gamemeta.hooks.customHooks.PlayerJoinedArena(arena, ply)
-	for k,v in pairs(arena.gamemode.userHooks.PlayerJoinedArena) do
-		v(arena, ply)
+function gamemeta.hooks.customHooks.PlayerJoinedArena(self, ply)
+	for k,v in pairs(self.gamemode.userHooks.PlayerJoinedArena) do
+		v(self.gamemode, ply)
 	end
 end
 
@@ -87,9 +87,9 @@ end
 		arena: <Arena> - The arena that was left
 		ply: Player - The player that left the arena
 */
-function gamemeta.hooks.customHooks.PlayerLeaveArena(arena, ply)
-	for k,v in pairs(arena.gamemode.userHooks.PlayerLeaveArena) do
-		v(arena, ply)
+function gamemeta.hooks.customHooks.PlayerLeaveArena(self, ply)
+	for k,v in pairs(self.gamemode.userHooks.PlayerLeaveArena) do
+		v(self.gamemode, ply)
 	end
 end
 
@@ -103,25 +103,22 @@ end
 		newTeam: string ?? - The name of the team the player joined
 		oldTeam: string ?? - The name of the team the player left
 */
-function gamemeta.hooks.customHooks.PlayerChangedTeam(arena, ply, newTeam, oldTeam)
-	for k,v in pairs(arena.gamemode.userHooks.PlayerChangedTeam) do
-		v(arena, ply, newTeam, oldTeam)
+function gamemeta.hooks.customHooks.PlayerChangedTeam(self, ply, newTeam, oldTeam)
+	for k,v in pairs(self.gamemode.userHooks.PlayerChangedTeam) do
+		v(self.gamemode, ply, newTeam, oldTeam)
 	end
 end
 
 /*
-	Function: PlayerChangedTeam
-	Called when a player changes team in the arena
-
-	*incomplete* not implemented properly
+	Function: InitializeGamemode
+	Called when the arena is ready for the gamemode
 
 	Parameters:
-		arena: <Arena> - The arena that was left
-		ply: Player - The player that left the arena
+		arena: <Arena> - The arena that is ready
 */
-function gamemeta.hooks.customHooks.InitializeGame(arena, ply)
-	for k,v in pairs(arena.gamemode.userHooks.InitializeGame) do
-		v(arena, ply)
+function gamemeta.hooks.customHooks.InitializeGamemode(self)
+	for k,v in pairs(self.gamemode.userHooks.InitializeGamemode) do
+		v(self.gamemode, ply)
 	end
 end
 
@@ -134,8 +131,8 @@ end
 	Parameters:
 		arena: <Arena> - The arena that's terminating
 */
-function gamemeta.hooks.customHooks.TerminateGame(arena)
-	for k,v in pairs(arena.gamemode.userHooks.TerminateGame) do
-		v(arena, ply)
+function gamemeta.hooks.customHooks.TerminateGame(self)
+	for k,v in pairs(self.gamemode.userHooks.TerminateGame) do
+		v(self.gamemode, ply)
 	end
 end

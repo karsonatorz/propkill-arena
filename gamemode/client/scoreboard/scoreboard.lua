@@ -151,34 +151,51 @@ function PANEL:RefreshScoreboard()
 				draw.RoundedBox(4, 0, 0, w, h, colors.primaryDark)
 			end
 
+			local avatar = vgui.Create("AvatarImage", prow)
+			avatar:SetSize(28, 28)
+			avatar:DockMargin(4,4,0,4)
+			avatar:Dock(LEFT)
+			avatar:SetPlayer(vv, 28)
+			avatar.button = vgui.Create("DButton", avatar)
+			avatar.button:Dock(FILL)
+			avatar.button:SetText("")
+			function avatar.button:Paint() end
+			function avatar.button:DoClick()
+				vv:ShowProfile()
+			end
+
 			local name = vgui.Create("DButton", prow)
 			name:Dock(LEFT)
 			function name:Paint(w, h)
-				if not IsValid(vv) then PK.menu:Show() end
-				draw.SimpleText(vv:Name() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				if not IsValid(vv) then PK.menu:Show() return end
+				draw.SimpleText(vv:Name() or "", "pk_playerfont", 10, h/2, vv:Alive() and colors.text or Color(100,100,100), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
 			local kills = vgui.Create("DButton", prow)
 			kills:Dock(LEFT)
 			function kills:Paint(w, h)
+				if not IsValid(vv) then return end
 				draw.SimpleText(vv:Frags() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
 			local deaths = vgui.Create("DButton", prow)
 			deaths:Dock(LEFT)
 			function deaths:Paint(w, h)
+				if not IsValid(vv) then return end
 				draw.SimpleText(vv:Deaths() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
 			local elo = vgui.Create("DButton", prow)
 			elo:Dock(LEFT)
 			function elo:Paint(w, h)
+				if not IsValid(vv) then return end
 				draw.SimpleText(vv:GetNWInt("Elo") or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
 			local ping = vgui.Create("DButton", prow)
 			ping:Dock(LEFT)
 			function ping:Paint(w, h)
+				if not IsValid(vv) then return end
 				draw.SimpleText(vv:Ping() or "", "pk_playerfont", 10, h/2, colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			end
 
@@ -186,7 +203,7 @@ function PANEL:RefreshScoreboard()
 				local colwidth = self:GetParent():GetWide()
 
 				self:SetWidth(colwidth)
-				name:SetWidth(colwidth * 0.52)
+				name:SetWidth((colwidth - 64) * 0.52)
 				kills:SetWidth(colwidth * 0.12)
 				deaths:SetWidth(colwidth * 0.12)
 				elo:SetWidth(colwidth * 0.12)
@@ -214,6 +231,9 @@ function PANEL:RefreshScoreboard()
 							net.WriteString(vv:GetNWString("arena"))
 							net.WriteEntity(vv)
 						net.SendToServer()
+					end)
+					right:AddOption((vv:IsMuted() and "Unmute" or "Mute"), function()
+						vv:SetMuted(not vv:IsMuted())
 					end)
 
 					right:Open()

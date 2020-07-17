@@ -16,10 +16,16 @@ gamemeta.hooks = {
 		"PlayerSpawnedProp",
 		// Function: DoPlayerDeath
 		"DoPlayerDeath",
+		// Function: PostPlayerDeath
+		"PostPlayerDeath",
 		// Function: PlayerDeath
 		"PlayerDeath",
 		// Function: PlayerSay
-		"PlayerSay"
+		"PlayerSay",
+		// Function: PhysgunDrop
+		"PhysgunDrop",
+		// Function: PhysgunPickup
+		"PhysgunPickup",
 	},
 	customHooks = {}
 }
@@ -56,9 +62,10 @@ function PK.NewGamemode(data)
 		teams = {},
 		round = {},
 		userHooks = {},
+		IsValid = function() return true end,
 	}
 	local newgm = setmetatable(gametemplate, gamemeta)
-	PK.gamemodes[gametemplate.abbr] = newgm
+	PK.gamemodes[newgm.abbr] = newgm
 
 	for k,v in pairs(newgm.hooks.playerHooks) do
 		newgm.userHooks[v] = {}
@@ -97,6 +104,16 @@ function gamemeta:CreateTeam(name, color)
 	return self.teams[name]
 end
 
+/*
+	Function: Gamemode:GetTeam()
+	Gets a team from the arena
+
+	Returns:
+		team: <Team> - Team from arena
+*/
+function gamemeta:GetTeam(name)
+	return self.teams[name]
+end
 
 /*
 	Function: Gamemode:SpawnPlayer()
@@ -104,23 +121,53 @@ end
 
 	Parameters:
 		ply: Player - The player to spawn
-		arena: <Arena> - The arena to spawn the player in
+		spawnset: string - Optional - The spawnset to use
+		teamname: string - Optional - The teams spawn to use
 */
-function gamemeta:SpawnPlayer(ply, arena)
-	local teamname = ply.team.name
+function gamemeta:SpawnPlayer(ply, spawnset, teamname)
+	if ply:Team() == TEAM_SPECTATOR then
+		ply:SetTeam(TEAM_DEATHMATCH)
+		ply:UnSpectate()
+		ply:SetCollisionGroup(COLLISION_GROUP_PLAYER)
+		ply:SetSolid(SOLID_BBOX)
+		ply.spectating = nil
+	end
 
-	if arena.positions.spawns[self.spawnset] == nil then
+	local teamname = teamname or ply.team.name
+	local spawnset = spawnset or self.spawnset
+
+	if self.arena.positions.spawns[spawnset] == nil then
 		ply:ChatPrint("no spawns for this arena")
 		return
-	elseif arena.positions.spawns[self.spawnset][teamname] == nil then
+	elseif self.arena.positions.spawns[spawnset][teamname] == nil then
 		ply:ChatPrint("no spawns for this team")
 		return
 	end
 
-	local spawn = math.random(1, #arena.positions.spawns[self.spawnset][teamname])
+	local spawn = math.random(1, #self.arena.positions.spawns[spawnset][teamname])
 
-	ply:SetPos(arena.positions.spawns[self.spawnset][teamname][spawn].pos)
-	ply:SetEyeAngles(arena.positions.spawns[self.spawnset][teamname][spawn].ang)
+	ply:SetPos(self.arena.positions.spawns[spawnset][teamname][spawn].pos)
+	ply:SetEyeAngles(self.arena.positions.spawns[spawnset][teamname][spawn].ang)
+end
+
+/*
+	Function: Gamemode:SpawnAsSpectator()
+	Spawn the player as a spectator. Useful for spectating players while eliminated from a round.
+
+	Parameters:
+		ply: Player - The player to spawn
+		spawnset: string - Optional - The spawnset to use
+		teamname: string - Optional - The teams spawn to use
+*/
+function gamemeta:SpawnAsSpectator(ply, spawnset, teamname)
+	ply:SetTeam(TEAM_SPECTATOR)
+	ply:SetCollisionGroup(COLLISION_GROUP_NONE)
+	ply:SetSolid(SOLID_NONE)
+	ply:StripWeapons()
+	GAMEMODE:PlayerSpawnAsSpectator(ply)
+	ply:Spectate(OBS_MODE_IN_EYE)
+	ply:SpectateEntity(self:GetTeam(ply.team.name).players[next(self:GetTeam(ply.team.name).players)])
+	ply.spectating = self.arena
 end
 
 /*

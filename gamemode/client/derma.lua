@@ -126,14 +126,6 @@ local function RealTeams()
 	return count
 end
 
-net.Receive("pk_teamselect", function()
-	if PK.menu:IsVisible() then
-		GAMEMODE.ScoreboardHide(GAMEMODE)
-	else
-		GAMEMODE.ScoreboardShow(GAMEMODE, "Arenas")
-	end
-end)
-
 /*net.Receive("pk_teamselect", function()
 	pk_cancloseteamselect = false
 	hook.Add("Think", "pk_checkf2key", function()

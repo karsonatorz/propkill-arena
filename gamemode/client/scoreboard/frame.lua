@@ -189,8 +189,8 @@ function GM:ScoreboardShow(tab)
 	if not IsValid(PK.menu) then
 		PK.menu = PK.CreateMenu()
 	end
-	gui.EnableScreenClicker(true)
-	RestoreCursorPosition()
+	//gui.EnableScreenClicker(true)
+	//RestoreCursorPosition()
 	PK.menu:Show(tab or "Scoreboard")
 end
 
@@ -200,12 +200,24 @@ function GM:ScoreboardHide()
 	PK.menu:Hide()
 end
 
-/*
-hook.Add("CreateMove", "enablemouseonclick", function()
-	if (input.WasMousePressed(MOUSE_LEFT) or input.WasMousePressed(MOUSE_RIGHT)) and PK.menu:IsVisible() then
-		isopen = true
-		PK.menu:ShowCloseButton(true)
+net.Receive("pk_teamselect", function()
+	if IsValid(PK.menu) and PK.menu:IsVisible() then
+		GAMEMODE.ScoreboardHide(GAMEMODE)
+	else
+		GAMEMODE.ScoreboardShow(GAMEMODE, "Arenas")
 		gui.EnableScreenClicker(true)
 	end
-end )
-*/
+end)
+
+hook.Add("InitPostEntity", "create menu", function()
+	if not IsValid(PK.menu) then
+		PK.menu = PK.CreateMenu()
+	end
+end)
+
+hook.Add("CreateMove", "enablemouseonclick", function()
+	if IsValid(PK.menu) and (input.WasMousePressed(MOUSE_LEFT) or input.WasMousePressed(MOUSE_RIGHT)) and PK.menu:IsVisible() then
+		gui.EnableScreenClicker(true)
+		//RestoreCursorPosition()
+	end
+end)

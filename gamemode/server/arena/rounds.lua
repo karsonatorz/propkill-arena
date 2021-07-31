@@ -56,7 +56,6 @@ function gamemeta:AdvanceRound()
 	// if AdvanceRound is called early
 	// for some reason the timer still exists after the callback so we'll check timeleft to see if it's actually over
 	if timer.Exists(curTimer) and timer.TimeLeft(curTimer) then
-		print("timer exists, removing")
 		timer.Remove(curTimer)
 		self.round[curRound][subRound].endCallback(self)
 		

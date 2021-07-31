@@ -87,6 +87,7 @@ function GM:PlayerDeath(ply, inflictor, attacker)
 	if IsValid(inflictor) and inflictor:GetClass() == "prop_physics" then
 		attacker = inflictor.Owner
 		attacker:SendLua("surface.PlaySound(\"/buttons/lightswitch2.wav\")")
+		//attacker:SendLua("surface.PlaySound(\"garrysmod/balloon_pop_cute.wav\")")
 		attacker.streak = attacker.streak + 1
 	end
 

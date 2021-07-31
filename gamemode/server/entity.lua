@@ -6,7 +6,7 @@ end)
 function GM:OnPhysgunReload() return false end
 function GM:PlayerSpawnSENT(ply) Notify(ply, "You can only spawn props!") return false end
 function GM:PlayerSpawnSWEP(ply) Notify(ply, "You can only spawn props!") return false end
-function GM:PlayerGiveSWEP(ply) Notify(ply, "You can only spawn props!") return false end
+//function GM:PlayerGiveSWEP(ply) Notify(ply, "You can only spawn props!") return false end
 function GM:PlayerSpawnEffect(ply) Notify(ply, "You can only spawn props!") return false end
 function GM:PlayerSpawnVehicle(ply) Notify(ply, "You can only spawn props!") return false end
 function GM:PlayerSpawnNPC(ply) Notify(ply, "You can only spawn props!") return false end

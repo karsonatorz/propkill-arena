@@ -1,0 +1,1 @@
+print("====== shared arena gamemoede ======")

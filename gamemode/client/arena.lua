@@ -3,6 +3,23 @@ arenameta.__index = arenameta
 
 include("arena/net.lua")
 include("arena/teams.lua")
+
+function PK.LoadGamemodes()
+	local dir = GAMEMODE.FolderName .. "/gamemodes/"
+	local files, folders = file.Find(dir .. "*", "LUA")
+
+	for k,v in pairs(folders) do
+		if file.Exists(dir .. v .. "/shared.lua", "LUA") then
+			include(dir .. v .. "/shared.lua")
+		end
+		if file.Exists(dir .. v .. "/cl_init.lua", "LUA") then
+			include(dir .. v .. "/cl_init.lua")
+		end
+	end
+end
+
+hook.Add("InitPostEntity", "pk_loadgamemodes", PK.LoadGamemodes)
+
 // Class: Global
 
 /*

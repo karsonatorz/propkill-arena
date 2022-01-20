@@ -159,12 +159,27 @@ end
 	Loads all the gamemodes ready for use
 */
 function PK.LoadGamemodes()
-	local files, folders = file.Find(GAMEMODE.FolderName .. "/gamemodes/*", "LUA")
+	local dir = GAMEMODE.FolderName .. "/gamemodes/"
+	local files, folders = file.Find(dir .. "*", "LUA")
+
 	for k,v in pairs(files) do
-		include(GAMEMODE.FolderName .. "/gamemodes/" .. v)
+		include(dir .. v)
 	end
+	
 	for k,v in pairs(folders) do
-		include(GAMEMODE.FolderName .. "/gamemodes/" .. v .. "/init.lua")
+		if file.Exists(dir .. v .. "/shared.lua", "LUA") then
+			include(dir .. v .. "/shared.lua")
+		end
+		if file.Exists(dir .. v .. "/init.lua", "LUA") then
+			include(dir .. v .. "/init.lua")
+		end
+
+		if file.Exists(dir .. v .. "/shared.lua", "LUA") then
+			AddCSLuaFile(dir .. v .. "/shared.lua")
+		end
+		if file.Exists(dir .. v .. "/cl_init.lua", "LUA") then
+			AddCSLuaFile(dir .. v .. "/cl_init.lua")
+		end
 	end
 end
 

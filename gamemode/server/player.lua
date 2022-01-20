@@ -92,7 +92,7 @@ function GM:PlayerDeath(ply, inflictor, attacker)
 	end
 
 	ply.streak = 0
-	ply.NextSpawnTime = ply.NextArenaSpawnTime or CurTime() + 2
+	ply.NextSpawnTime = ply.NextArenaSpawnTime or CurTime() + 1
 	ply.NextArenaSpawnTime = nil
 
 	net.Start("KilledByProp")

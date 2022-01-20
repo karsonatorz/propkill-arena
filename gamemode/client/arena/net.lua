@@ -104,6 +104,7 @@ end)
 
 net.Receive("PK_ArenaNetJoinArena", function()
 	local canjoin = net.ReadBool()
+	local arenaid = net.ReadString()
 	local reason = net.ReadString()
 
 	if not canjoin then

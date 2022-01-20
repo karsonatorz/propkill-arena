@@ -179,6 +179,7 @@ net.Receive("PK_ArenaNetJoinArena", function(len, ply)
 
 	net.Start("PK_ArenaNetJoinArena")
 		net.WriteBool(canjoin)
+		net.WriteString(arenaid)
 		net.WriteString(not canjoin and reason or "")
 	net.Send(ply)
 

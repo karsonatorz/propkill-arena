@@ -151,3 +151,5 @@ function meta:freezeEnt()
 	self.grabcooldown = CurTime() + 1
 	self:releaseEnt()
 end
+
+// test
